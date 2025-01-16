@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(TRPG-Demo LANGUAGES CXX)
+project(TRPG-demo LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/..)
 
@@ -12,5 +12,10 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(TRPG-Demo src/main.cxx)
-target_link_libraries(TRPG-Demo PRIVATE SFML::Graphics)
+include_directories(hdr)
+
+add_executable(${PROJECT_NAME} src/main.cxx)
+add_library(character src/character.cxx)
+target_link_libraries(${PROJECT_NAME} PRIVATE character)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE SFML::Graphics)
