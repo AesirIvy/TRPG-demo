@@ -2,7 +2,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include "being.hxx"
 
@@ -10,46 +9,55 @@ Being::Being(std::string name): m_name(name), base(), current() {
 
 }
 
-void Being::baseAttack(auto enemy) {
+Being::~Being() {
+
+}
+
+void Being::basicAttack(Being& enemy) {
 	int dmg = current.ATK - enemy.current.DEF;
 	if (dmg > 0) {
 		enemy.receiveDmg(dmg);
 	}
 }
 
-void Being::statInit() {
-	m_maxHP = base.HP * m_lvl;
-	m_maxEP = base.EP * m_lvl;
-}
-
-Character::Character(std::string name): Being(name) {
-	std::ifstream file("src/data/being/characters.csv");
+bool Being::statInitFromFile(std::string file_path) {
+	std::ifstream file(file_path);
 	std::string line;
 	while (std::getline(file, line)) {
 		bool nextLoop = false;
 		std::string token;
 		std::stringstream ss(line);
-		std::vector<std::string> tokens;
-		while (std::getline(ss, token, '\t')) {
-			if (token != name) {
-				nextLoop = true;
-				break;
-			} else {
-				continue;
-			}
-			tokens.push_back(token);
+
+		std::getline(ss, token, '\t');
+		if (token != m_name) {
+			continue;
 		}
-		if (nextLoop) continue;
-		if (tokens[0] == name) {
-			base.HP = std::stoi(tokens[1]);
-			base.ATK = std::stoi(tokens[2]);
-			base.DEF = std::stoi(tokens[3]);
-			statInit();
-			fullRecovery();
-			return;
-		}
+
+		std::getline(ss, token, '\t');
+		base.HP = std::stoi(token);
+		std::getline(ss, token, '\t');
+		base.ATK = std::stoi(token);
+		std::getline(ss, token, '\t');
+		base.DEF = std::stoi(token);
+
+		statRefresh();
+		return true;
 	}
-	std::cout << name << " not fount in database" << std::endl;
+	std::cout << m_name << " not found in database" << std::endl;
+	return false;
+}
+
+void Being::statRefresh() {
+	m_maxHP = base.HP * m_lvl;
+	m_maxEP = base.EP * m_lvl;
+	current.ATK = base.ATK * m_lvl;
+	current.DEF = base.DEF * m_lvl;
+}
+
+Character::Character(std::string name): Being(name) {
+	if (statInitFromFile("src/data/being/characters.csv")) {
+		fullRecovery();
+	};
 }
 
 void Character::battleInit() {
@@ -61,7 +69,7 @@ void Character::checkLvlUp() {
 	if (m_exp >= expRequired) {
 		m_lvl += 1;
 		m_exp -= expRequired;
-		statInit();
+		statRefresh();
 	}
 }
 
@@ -115,33 +123,9 @@ void Character::receiveDmg(int amount) {
 }
 
 Creature::Creature(std::string name): Being(name) {
-	std::ifstream file("src/data/being/creatures.csv");
-	std::string line;
-	while (std::getline(file, line)) {
-		bool nextLoop = false;
-		std::string token;
-		std::stringstream ss(line);
-		std::vector<std::string> tokens;
-		while (std::getline(ss, token, '\t')) {
-			if (token != name) {
-				nextLoop = true;
-				break;
-			} else {
-				continue;
-			}
-			tokens.push_back(token);
-		}
-		if (nextLoop) continue;
-		if (tokens[0] == name) {
-			base.HP = std::stoi(tokens[1]);
-			base.ATK = std::stoi(tokens[2]);
-			base.DEF = std::stoi(tokens[3]);
-			statInit();
-			fullRecovery();
-			return;
-		}
-	}
-	std::cout << name << " not fount in database" << std::endl;
+	if (statInitFromFile("src/data/being/creatures.csv")) {
+		fullRecovery();
+	};
 }
 
 void Creature::fullRecovery() {

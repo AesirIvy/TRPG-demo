@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <SFML/Graphics.hpp>
 
 #include "being.hxx"
@@ -7,8 +9,11 @@ int main() {
 	window.setVerticalSyncEnabled(true);
 
 	//test
-	Creature megaAraney = Creature("megaAraney");
+	Creature megarana = Creature("Megarana");
 	Character fenris = Character("Fenris");
+	std::cout << megarana.current.HP << '\n';
+	fenris.basicAttack(megarana);
+	std::cout << megarana.current.HP << std::endl;
 
 	while (window.isOpen()) {
 		while (const std::optional event = window.pollEvent()) {

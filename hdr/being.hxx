@@ -14,15 +14,18 @@ struct Stats {
 class Being {
 public:
 	bool alive = true;
-	unsigned int m_lvl;
+	unsigned int m_lvl = 1;
 
 	Stats base;
 	Stats current;
 
-	void baseAttack(auto opponent);
-	void statInit();
+	void basicAttack(Being& enemy);
+	virtual void receiveDmg(int amount) = 0;
+	bool statInitFromFile(std::string file_path);
+	void statRefresh();
 
 	Being(std::string name);
+	virtual ~Being();
 
 protected:
 	std::string m_name;
@@ -30,7 +33,7 @@ protected:
 	int m_maxEP;
 };
 
-class Creature : public Being {
+class Creature: public Being {
 public:
 	Creature(std::string name);
 
@@ -38,7 +41,7 @@ public:
 	void receiveDmg(int amount);
 };
 
-class Character : public Being {
+class Character: public Being {
 public:
 	short charge;
 	unsigned int status;
