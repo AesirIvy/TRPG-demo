@@ -20,8 +20,8 @@ void Being::basicAttack(Being& enemy) {
 	}
 }
 
-bool Being::statInitFromFile(std::string file_path) {
-	std::ifstream file(file_path);
+bool Being::statInitFromFile(std::string filePath) {
+	std::ifstream file(filePath);
 	std::string line;
 	while (std::getline(file, line)) {
 		bool nextLoop = false;
@@ -55,7 +55,7 @@ void Being::statRefresh() {
 }
 
 Character::Character(std::string name): Being(name) {
-	if (statInitFromFile("src/data/being/characters.csv")) {
+	if (statInitFromFile("src/data/being/character.csv")) {
 		fullRecovery();
 	};
 }
@@ -123,7 +123,7 @@ void Character::receiveDmg(int amount) {
 }
 
 Creature::Creature(std::string name): Being(name) {
-	if (statInitFromFile("src/data/being/creatures.csv")) {
+	if (statInitFromFile("src/data/being/creature.csv")) {
 		fullRecovery();
 	};
 }

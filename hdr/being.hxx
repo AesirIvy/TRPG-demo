@@ -1,15 +1,7 @@
 #ifndef BEING_H
 #define BEING_H
 
-struct Stats {
-	int SP;    // Shield Point
-	int HP;    // HealtH Point
-	int EP;    // Energy Point
-	int ATK;   // Attack
-	int DEF;   // Defense
-	int SPD;   // Speed
-	short CR;  // Critical Rate
-};
+#include "stat.hxx"
 
 class Being {
 public:
@@ -21,7 +13,7 @@ public:
 
 	void basicAttack(Being& enemy);
 	virtual void receiveDmg(int amount) = 0;
-	bool statInitFromFile(std::string file_path);
+	bool statInitFromFile(std::string filePath);
 	void statRefresh();
 
 	Being(std::string name);
