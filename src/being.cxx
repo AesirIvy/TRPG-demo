@@ -54,7 +54,7 @@ void Being::statRefresh() {
 	current.DEF = base.DEF * m_lvl;
 }
 
-Character::Character(std::string name): Being(name) {
+Character::Character(std::string name): Being(name), weapon("None") {
 	if (statInitFromFile("src/data/being/character.csv")) {
 		fullRecovery();
 	};
@@ -71,6 +71,11 @@ void Character::checkLvlUp() {
 		m_exp -= expRequired;
 		statRefresh();
 	}
+}
+
+void Character::equip(std::string name) {
+	weapon = Weapon(name);
+	statRefresh();
 }
 
 void Character::fullRecovery() {
@@ -120,6 +125,13 @@ void Character::receiveDmg(int amount) {
 	}
 	m_recoveryGauge = current.HP;
 	current.HP -= amount;
+}
+
+void Character::statRefresh() {
+	m_maxHP = base.HP * m_lvl;
+	m_maxEP = base.EP * m_lvl;
+	current.ATK = (base.ATK + weapon.increment.ATK) * m_lvl;
+	current.DEF = (base.DEF + weapon.increment.DEF) * m_lvl;
 }
 
 Creature::Creature(std::string name): Being(name) {

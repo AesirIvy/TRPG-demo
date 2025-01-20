@@ -1,3 +1,4 @@
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -5,8 +6,8 @@
 
 #include "equipment.hxx"
 
-Equipment::Equipment(std::string name): m_name(name), increment() {
-
+Equipment::Equipment(std::string name): m_name(name) {
+	std::memset(&increment, 0, sizeof(increment));
 }
 
 void Equipment::statInitFromFile(std::string filePath) {

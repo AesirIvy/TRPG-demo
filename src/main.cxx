@@ -11,6 +11,9 @@ int main() {
 	//test
 	Creature megarana = Creature("Megarana");
 	Character fenris = Character("Fenris");
+	std::cout << fenris.current.ATK << '\n';
+	fenris.equip("Aetherbane");
+	std::cout << fenris.current.ATK << "\n\n";
 	std::cout << megarana.current.HP << '\n';
 	fenris.basicAttack(megarana);
 	std::cout << megarana.current.HP << std::endl;
