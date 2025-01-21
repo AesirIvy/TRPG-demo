@@ -48,10 +48,10 @@ bool Being::statInitFromFile(std::string filePath) {
 }
 
 void Being::statRefresh() {
-	m_maxHP = base.HP * m_lvl;
-	m_maxEP = base.EP * m_lvl;
-	current.ATK = base.ATK * m_lvl;
-	current.DEF = base.DEF * m_lvl;
+	m_maxHP = base.HP;
+	m_maxEP = base.EP;
+	current.ATK = base.ATK;
+	current.DEF = base.DEF;
 }
 
 Character::Character(std::string name): Being(name), weapon("None") {
@@ -62,15 +62,6 @@ Character::Character(std::string name): Being(name), weapon("None") {
 
 void Character::battleInit() {
 	charge = 0;
-}
-
-void Character::checkLvlUp() {
-	int expRequired = 150 * m_lvl;
-	if (m_exp >= expRequired) {
-		m_lvl += 1;
-		m_exp -= expRequired;
-		statRefresh();
-	}
 }
 
 void Character::equip(std::string name) {
@@ -91,17 +82,17 @@ void Character::heal(int amount) {
 	}
 }
 
-void Character::increaseSP(int amount) {
-	current.SP += amount;
-	if (current.SP > m_maxHP) {
-		current.SP = m_maxHP;
-	}
-}
-
 void Character::increaseCharge(int amount) {
 	charge += amount;
 	if (charge > 300) {
 		charge = 300;
+	}
+}
+
+void Character::increaseSP(int amount) {
+	current.SP += amount;
+	if (current.SP > m_maxHP) {
+		current.SP = m_maxHP;
 	}
 }
 
@@ -128,10 +119,10 @@ void Character::receiveDmg(int amount) {
 }
 
 void Character::statRefresh() {
-	m_maxHP = base.HP * m_lvl;
-	m_maxEP = base.EP * m_lvl;
-	current.ATK = (base.ATK + weapon.increment.ATK) * m_lvl;
-	current.DEF = (base.DEF + weapon.increment.DEF) * m_lvl;
+	m_maxHP = base.HP;
+	m_maxEP = base.EP;
+	current.ATK = base.ATK + weapon.increment.ATK;
+	current.DEF = base.DEF + weapon.increment.DEF;
 }
 
 Creature::Creature(std::string name): Being(name) {

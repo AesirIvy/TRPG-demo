@@ -7,7 +7,6 @@
 class Being {
 public:
 	bool alive = true;
-	unsigned int m_lvl = 1;
 
 	Stats base;
 	Stats current;
@@ -44,7 +43,6 @@ public:
 	Character(std::string name);
 
 	void battleInit();
-	void checkLvlUp();
 	void equip(std::string name);
 	void fullRecovery();
 	void heal(int amount);
@@ -57,7 +55,6 @@ public:
 
 private:
 	int m_recoveryGauge;
-	unsigned int m_exp = 0;
 };
 
 #endif
