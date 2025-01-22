@@ -14,6 +14,11 @@ protected:
 	std::string m_name;
 };
 
+class Artifact: public Equipment {
+public:
+	Artifact(std::string name);
+};
+
 class Weapon: public Equipment {
 public:
 	Weapon(std::string name);

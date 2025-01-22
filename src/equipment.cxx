@@ -19,9 +19,7 @@ void Equipment::statInitFromFile(std::string filePath) {
 		std::stringstream ss(line);
 
 		std::getline(ss, token, '\t');
-		if (token != m_name) {
-			continue;
-		}
+		if (token != m_name) continue;
 
 		std::getline(ss, token, '\t');
 		increment.HP = std::stoi(token);
@@ -33,6 +31,10 @@ void Equipment::statInitFromFile(std::string filePath) {
 		return;
 	}
 	std::cout << m_name << " not found in database" << std::endl;
+}
+
+Artifact::Artifact(std::string name): Equipment(name) {
+	statInitFromFile("src/data/equipment/artifact.csv");
 }
 
 Weapon::Weapon(std::string name): Equipment(name) {

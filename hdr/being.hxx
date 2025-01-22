@@ -12,9 +12,9 @@ public:
 	Stats current;
 
 	void basicAttack(Being& enemy);
+	void battleStatRefresh();
 	virtual void receiveDmg(int amount) = 0;
 	bool statInitFromFile(std::string filePath);
-	virtual void statRefresh();
 
 	Being(std::string name);
 	virtual ~Being();
@@ -38,12 +38,16 @@ public:
 	short charge;
 	unsigned int status;
 
-	Weapon weapon;
+	Artifact artifact = Artifact("None");
+	Weapon weapon = Weapon("None");
 
 	Character(std::string name);
 
 	void battleInit();
-	void equip(std::string name);
+	void depriveArtifact();
+	void depriveWeapon();
+	void equipArtifact(std::string name);
+	void equipWeapon(std::string name);
 	void fullRecovery();
 	void heal(int amount);
 	void increaseSP(int amount);
@@ -51,7 +55,7 @@ public:
 	bool isOnDeathDoor() const;
 	unsigned short isUltReady() const;
 	void receiveDmg(int amount) override;
-	void statRefresh() override;
+	void statRefresh();
 
 private:
 	int m_recoveryGauge;

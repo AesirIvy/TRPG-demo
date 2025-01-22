@@ -29,9 +29,7 @@ bool Being::statInitFromFile(std::string filePath) {
 		std::stringstream ss(line);
 
 		std::getline(ss, token, '\t');
-		if (token != m_name) {
-			continue;
-		}
+		if (token != m_name) continue;
 
 		std::getline(ss, token, '\t');
 		base.HP = std::stoi(token);
@@ -40,21 +38,23 @@ bool Being::statInitFromFile(std::string filePath) {
 		std::getline(ss, token, '\t');
 		base.DEF = std::stoi(token);
 
-		statRefresh();
+		m_maxHP = base.HP;
+		m_maxEP = base.EP;
+		current.ATK = base.ATK;
+		current.DEF = base.DEF;
 		return true;
 	}
 	std::cout << m_name << " not found in database" << std::endl;
 	return false;
 }
 
-void Being::statRefresh() {
-	m_maxHP = base.HP;
-	m_maxEP = base.EP;
-	current.ATK = base.ATK;
-	current.DEF = base.DEF;
+void Being::battleStatRefresh() {
+	int percentageHP = current.HP / m_maxHP;
+	current.ATK = base.ATK * percentageHP;
+	current.DEF = base.DEF * percentageHP;
 }
 
-Character::Character(std::string name): Being(name), weapon("None") {
+Character::Character(std::string name): Being(name) {
 	if (statInitFromFile("src/data/being/character.csv")) {
 		fullRecovery();
 	};
@@ -64,7 +64,22 @@ void Character::battleInit() {
 	charge = 0;
 }
 
-void Character::equip(std::string name) {
+void Character::depriveArtifact() {
+	artifact = Artifact("None");
+	statRefresh();
+}
+
+void Character::depriveWeapon() {
+	weapon = Weapon("None");
+	statRefresh();
+}
+
+void Character::equipArtifact(std::string name) {
+	artifact = Artifact(name);
+	statRefresh();
+}
+
+void Character::equipWeapon(std::string name) {
 	weapon = Weapon(name);
 	statRefresh();
 }
