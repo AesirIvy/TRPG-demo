@@ -13,7 +13,7 @@ Being::~Being() {
 
 }
 
-void Being::basicAttack(Being& enemy) {
+void Being::basicAttack(Being &enemy) {
 	int dmg = current.ATK - enemy.current.DEF;
 	if (dmg > 0) {
 		enemy.receiveDmg(dmg);

@@ -1,17 +1,20 @@
 #ifndef BEING_H
 #define BEING_H
 
+#include <string>
+
 #include "equipment.hxx"
 #include "stat.hxx"
 
 class Being {
 public:
 	bool alive = true;
+	int IP;  // Initiative Point
 
 	Stats base;
 	Stats current;
 
-	void basicAttack(Being& enemy);
+	void basicAttack(Being &enemy);
 	void battleStatRefresh();
 	virtual void receiveDmg(int amount) = 0;
 	bool statInitFromFile(std::string filePath);

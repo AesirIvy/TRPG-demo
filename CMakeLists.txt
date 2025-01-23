@@ -17,7 +17,7 @@ FetchContent_MakeAvailable(SFML)
 include_directories(hdr)
 
 add_executable(${PROJECT_NAME} src/main.cxx)
-add_library(status src/being.cxx src/equipment.cxx)
+add_library(status src/battle.cxx src/being.cxx src/equipment.cxx src/util.cxx)
 target_link_libraries(${PROJECT_NAME} PRIVATE status)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SFML::Graphics)

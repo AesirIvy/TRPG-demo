@@ -1,6 +1,8 @@
 #ifndef EQUIPMENT_H
 #define EQUIPMENT_H
 
+#include <string>
+
 #include "stat.hxx"
 
 class Equipment {
