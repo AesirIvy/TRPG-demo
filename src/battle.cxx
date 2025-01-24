@@ -1,12 +1,11 @@
-#include <initializer_list>
-
+#include <array>
 #include <vector>
 
 #include "battle.hxx"
 #include "being.hxx"
 
 void addToTimeline(std::vector<Being *> &timeline, Being &being) {
-	being.IP = 100 - being.current.SPD;
+	being.IP = being.current.TD;
 	for (unsigned short i = 0; i < timeline.size(); ++i) {
 		if (being.IP < timeline[i]->IP) {
 			timeline.insert(timeline.begin() + i, &being);
@@ -16,11 +15,21 @@ void addToTimeline(std::vector<Being *> &timeline, Being &being) {
 	timeline.push_back(&being);
 }
 
-void startBattle(std::vector<Being *> allyArr, std::vector<Being *> enemyArr) {
+Being *advanceTimeline(std::vector<Being *> &timeline) {
+	Being *leadBeing = timeline[0];
+	timeline.erase(timeline.begin());
+	for (unsigned short i = 0; i < timeline.size(); ++i) {
+		timeline[i]->IP -= leadBeing->IP;
+	}
+	return leadBeing;
+}
+
+void startBattle(std::vector<Being *> allyVec, std::vector<Being *> enemyVec) {
 	std::vector<Being *> timeline;
-	for (auto arr: {allyArr, enemyArr}) {
-		for (unsigned short i = 0; i < arr.size(); ++i) {
-			addToTimeline(timeline, *arr[i]);
+	for (const std::vector<Being *> &vec: {allyVec, enemyVec}) {
+		for (unsigned short i = 0; i < vec.size(); ++i) {
+			addToTimeline(timeline, *vec[i]);
 		}
 	}
+	Being *leadBeing = advanceTimeline(timeline);
 }

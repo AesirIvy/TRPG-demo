@@ -7,8 +7,9 @@ struct Stats {
 	int EP;    // Energy Point
 	int ATK;   // Attack
 	int DEF;   // Defense
-	int SPD;   // Speed
 	short CR;  // Critical Rate
+
+	short TD;  // Turn Delay
 };
 
 #endif

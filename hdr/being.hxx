@@ -10,6 +10,7 @@ class Being {
 public:
 	bool alive = true;
 	int IP;  // Initiative Point
+	std::string name;
 
 	Stats base;
 	Stats current;
@@ -17,13 +18,12 @@ public:
 	void basicAttack(Being &enemy);
 	void battleStatRefresh();
 	virtual void receiveDmg(int amount) = 0;
-	bool statInitFromFile(std::string filePath);
+	void statInitFromFile(std::string filePath);
 
 	Being(std::string name);
 	virtual ~Being();
 
 protected:
-	std::string m_name;
 	int m_maxHP;
 	int m_maxEP;
 };

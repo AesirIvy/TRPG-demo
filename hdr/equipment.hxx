@@ -7,13 +7,12 @@
 
 class Equipment {
 public:
+	std::string name;
+
 	Stats increment;
 
 	void statInitFromFile(std::string file_path);
 	Equipment(std::string name);
-
-protected:
-	std::string m_name;
 };
 
 class Artifact: public Equipment {

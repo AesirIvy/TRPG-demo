@@ -1,20 +1,20 @@
+#include <array>
 #include <iostream>
+#include <vector>
 
-#include <SFML/Graphics.hpp>
+// #include <SFML/Graphics.hpp>
 
+#include "battle.hxx"
 #include "being.hxx"
+#include "simulation.hxx"
 
 int main() {
+	simulation();
+
+/*
 	sf::RenderWindow window(sf::VideoMode({960, 544}), "TRPG-demo");
 	window.setVerticalSyncEnabled(true);
 
-	//test
-	Creature megarana = Creature("Megarana");
-	Character fenris = Character("Fenris");
-	fenris.equipWeapon("Aetherbane");
-
-
-/*
 	while (window.isOpen()) {
 		while (const std::optional event = window.pollEvent()) {
 			if (event->is<sf::Event::Closed>()) {

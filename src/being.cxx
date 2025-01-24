@@ -5,7 +5,7 @@
 
 #include "being.hxx"
 
-Being::Being(std::string name): m_name(name), base(), current() {
+Being::Being(std::string name): name(name), base(), current() {
 
 }
 
@@ -20,7 +20,7 @@ void Being::basicAttack(Being &enemy) {
 	}
 }
 
-bool Being::statInitFromFile(std::string filePath) {
+void Being::statInitFromFile(std::string filePath) {
 	std::ifstream file(filePath);
 	std::string line;
 	while (std::getline(file, line)) {
@@ -29,7 +29,7 @@ bool Being::statInitFromFile(std::string filePath) {
 		std::stringstream ss(line);
 
 		std::getline(ss, token, '\t');
-		if (token != m_name) continue;
+		if (token != name) continue;
 
 		std::getline(ss, token, '\t');
 		base.HP = std::stoi(token);
@@ -37,15 +37,17 @@ bool Being::statInitFromFile(std::string filePath) {
 		base.ATK = std::stoi(token);
 		std::getline(ss, token, '\t');
 		base.DEF = std::stoi(token);
+		std::getline(ss, token, '\t');
+		base.TD = std::stoi(token);
 
 		m_maxHP = base.HP;
 		m_maxEP = base.EP;
 		current.ATK = base.ATK;
 		current.DEF = base.DEF;
-		return true;
+		current.TD = base.TD;
+		return;
 	}
-	std::cout << m_name << " not found in database" << std::endl;
-	return false;
+	throw std::invalid_argument(name + " not found in database\n");
 }
 
 void Being::battleStatRefresh() {
@@ -55,9 +57,8 @@ void Being::battleStatRefresh() {
 }
 
 Character::Character(std::string name): Being(name) {
-	if (statInitFromFile("src/data/being/character.csv")) {
-		fullRecovery();
-	};
+	statInitFromFile("src/data/being/character.csv");
+	fullRecovery();
 }
 
 void Character::battleInit() {
@@ -141,9 +142,8 @@ void Character::statRefresh() {
 }
 
 Creature::Creature(std::string name): Being(name) {
-	if (statInitFromFile("src/data/being/creature.csv")) {
-		fullRecovery();
-	};
+	statInitFromFile("src/data/being/creature.csv");
+	fullRecovery();
 }
 
 void Creature::fullRecovery() {

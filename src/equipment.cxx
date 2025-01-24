@@ -6,7 +6,7 @@
 
 #include "equipment.hxx"
 
-Equipment::Equipment(std::string name): m_name(name) {
+Equipment::Equipment(std::string name): name(name) {
 	std::memset(&increment, 0, sizeof(increment));
 }
 
@@ -19,7 +19,7 @@ void Equipment::statInitFromFile(std::string filePath) {
 		std::stringstream ss(line);
 
 		std::getline(ss, token, '\t');
-		if (token != m_name) continue;
+		if (token != name) continue;
 
 		std::getline(ss, token, '\t');
 		increment.HP = std::stoi(token);
@@ -30,7 +30,7 @@ void Equipment::statInitFromFile(std::string filePath) {
 
 		return;
 	}
-	std::cout << m_name << " not found in database" << std::endl;
+	std::cout << name << " not found in database" << std::endl;
 }
 
 Artifact::Artifact(std::string name): Equipment(name) {
