@@ -5,11 +5,7 @@
 
 #include "being.hxx"
 
-Being::Being(std::string name): name(name), base(), current() {
-
-}
-
-Being::~Being() {
+Being::Being(const std::string &name): name(name), base(), current() {
 
 }
 
@@ -24,7 +20,6 @@ void Being::statInitFromFile(std::string filePath) {
 	std::ifstream file(filePath);
 	std::string line;
 	while (std::getline(file, line)) {
-		bool nextLoop = false;
 		std::string token;
 		std::stringstream ss(line);
 
@@ -41,7 +36,6 @@ void Being::statInitFromFile(std::string filePath) {
 		base.TD = std::stoi(token);
 
 		m_maxHP = base.HP;
-		m_maxEP = base.EP;
 		current.ATK = base.ATK;
 		current.DEF = base.DEF;
 		current.TD = base.TD;
@@ -56,7 +50,7 @@ void Being::battleStatRefresh() {
 	current.DEF = base.DEF * percentageHP;
 }
 
-Character::Character(std::string name): Being(name) {
+Character::Character(const std::string &name): Being(name) {
 	statInitFromFile("src/data/being/character.csv");
 	fullRecovery();
 }
@@ -75,19 +69,16 @@ void Character::depriveWeapon() {
 	statRefresh();
 }
 
-void Character::equipArtifact(std::string name) {
-	artifact = Artifact(name);
-	statRefresh();
-}
-
-void Character::equipWeapon(std::string name) {
-	weapon = Weapon(name);
-	statRefresh();
+void Character::equip(const Equipment &equipment) {
+	if (const Artifact *artifactPtr = dynamic_cast<const Artifact *>(&equipment)) {
+		artifact = *artifactPtr;
+	} else if (const Weapon *weaponPtr = dynamic_cast<const Weapon *>(&equipment)) {
+		weapon = *weaponPtr;
+	}
 }
 
 void Character::fullRecovery() {
 	current.HP = m_maxHP;
-	current.EP = m_maxEP;
 	m_recoveryGauge = m_maxHP;
 }
 
@@ -127,6 +118,7 @@ unsigned short Character::isUltReady() const {
 }
 
 void Character::receiveDmg(int amount) {
+	if (!guarding) amount *= 1.5;  // critical damage for being off-guard
 	if (isOnDeathDoor()) {
 		alive = false;
 	}
@@ -136,19 +128,17 @@ void Character::receiveDmg(int amount) {
 
 void Character::statRefresh() {
 	m_maxHP = base.HP;
-	m_maxEP = base.EP;
 	current.ATK = base.ATK + weapon.increment.ATK;
 	current.DEF = base.DEF + weapon.increment.DEF;
 }
 
-Creature::Creature(std::string name): Being(name) {
+Creature::Creature(const std::string &name): Being(name) {
 	statInitFromFile("src/data/being/creature.csv");
 	fullRecovery();
 }
 
 void Creature::fullRecovery() {
 	current.HP = m_maxHP;
-	current.EP = m_maxEP;
 }
 
 void Creature::receiveDmg(int amount) {

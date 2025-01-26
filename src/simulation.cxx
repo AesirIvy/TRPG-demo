@@ -1,127 +1,146 @@
 #include <cstdlib>
-#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "being.hxx"
+#include "util.hxx"
 
-void printCSV(std::string filePath) {
-	std::ifstream file(filePath);
-	std::string line;
-	std::string temp;
-	const unsigned short lastColIdx = 4;
+static std::vector<Being *> s_allyParty;
+static std::vector<Being *> s_enemyParty;
 
-	std::cout << "╔";
-	for (int i = 0; i < 16; ++i) std::cout << "═";
-	for (int i = 0; i < lastColIdx; ++i) {
-		std::cout << "╤";
-		for (int j = 0; j < 8; ++j) {
-			std::cout << "═";
-		}
-	}
-	std::cout << "╗\n";
-
-	std::getline(file, line);
-	std::cout << "║";
-	std::istringstream stream(line);
-	int column = 0;
-	while(stream >> temp) {
-		std::cout << temp;
-		for (unsigned short i = temp.size(); i < 16; ++i) {
-			if (i == 8 & column > 0) break;
-			std::cout << ' ';
-		}
-		if (column != lastColIdx) std::cout << "│";
-		++column;
-	}
-	std::cout << "║\n";
-	std::cout << "╠";
-	for (int i = 0; i < 16; ++i) std::cout << "═";
-	for (int i = 0; i < 4; ++i) {
-		std::cout << "╪";
-		for (int j = 0; j < 8; ++j) {
-			std::cout << "═";
-		}
-	}
-	std::cout << "╣\n";
-
-	while (std::getline(file, line)) {
-		std::cout << "║";
-		std::istringstream stream(line);
-		int column = 0;
-		while(stream >> temp) {
-			std::cout << temp;
-			for (unsigned short i = temp.size(); i < 16; ++i) {
-				if (i == 8 & column > 0) break;
-				std::cout << ' ';
-			}
-			if (column != lastColIdx) std::cout << "│";
-			++column;
-		}
-		std::cout << "║\n";
-		if (file.peek() == EOF) break;
-		std::cout << "╟";
-		for (int i = 0; i < 16; ++i) std::cout << "─";
-		for (int i = 0; i < 4; ++i) {
-			std::cout << "┼";
-			for (int j = 0; j < 8; ++j) {
-				std::cout << "─";
-			}
-		}
-		std::cout << "╢\n";
-	}
-
-	std::cout << "╚";
-	for (int i = 0; i < 16; ++i) std::cout << "═";
-	for (int i = 0; i < lastColIdx; ++i) {
-		std::cout << "╧";
-		for (int j = 0; j < 8; ++j) {
-			std::cout << "═";
-		}
-	}
-	std::cout << "╝\n";
-
-	file.close();
-	std::cout << std::endl;
+std::vector<Being *> *checkSide(const std::string &side) {
+	if (side == "ally" || side == "1") return &s_allyParty;
+	if (side == "enemy" || side == "2") return &s_enemyParty;
+	std::cout << "invalid argument: must be ally or enemy, but got ";
+	std::cout << side << '\n' << std::endl;
+	return nullptr;
 }
 
-void printParty(std::vector<Being *> &party) {
-	if (party.empty()) {
-		std::cout << "party is empty\n" << std::endl;
+void list(const std::vector<std::string> &args) {
+	if (args.size() < 2) {
+		std::cout << "missing argument\n" << std::endl;
 		return;
 	}
-	for (unsigned short i = 0; i < party.size(); ++i) {
-		std::cout << party[i]->name;
-		if (Character *character = dynamic_cast<Character *>(party[i])) {
-			std::cout << " weapon: ";
-			std::cout << character->weapon.name << " artifact: ";
-			std::cout << character->artifact.name;
-		}
-		std::cout << '\n';
+	system("clear");
+	if (args[1] == "artifact" || args[1] == "1") {
+		printCSV("src/data/equipment/artifact.csv");
+	} else if (args[1] == "creature" || args[1] == "2") {
+		printCSV("src/data/being/creature.csv");
+	} else if (args[1] == "character" || args[1] == "3") {
+		printCSV("src/data/being/character.csv");
+	} else if (args[1] == "weapon" || args[1] == "4") {
+		printCSV("src/data/equipment/weapon.csv");
+	} else {
+		std::cout << "no valid argument\n" << std::endl;
 	}
-	std::cout << std::endl;
+}
+
+void view(const std::vector<std::string> &args) {
+	if (args.size() < 2) {
+		std::cout << "missing argument\n" << std::endl;
+		return;
+	}
+	const std::vector<Being *> *party = checkSide(args[1]);
+	if (party) printParty(*party);
+}
+
+void add(const std::vector<std::string> &args) {
+	if (args.size() < 4) {
+		std::cout << "missing argument\n" << std::endl;
+		return;
+	}
+	std::vector<Being *> *party = checkSide(args[1]);
+	if (!party) return;
+	if (args[2] == "creature" || args[2] == "1") {
+		try {
+			(*party).push_back(new Creature(args[3]));
+		} catch (const std::invalid_argument &error) {
+			std::cout << "invalid name\n" << std::endl;
+		}
+		printParty(*party);
+	} else if (args[2] == "character" || args[2] == "2") {
+		try {
+			(*party).push_back(new Character(args[3]));
+		} catch (const std::invalid_argument &error) {
+			std::cout << "invalid name\n" << std::endl;
+		}
+		printParty(*party);
+	} else {
+		std::cout << "invalid argument\n" << std::endl;
+	}
+}
+
+void remove(const std::vector<std::string> &args) {
+	if (args.size() < 3) {
+		std::cout << "missing argument\n" << std::endl;
+		return;
+	}
+	std::vector<Being *> *party = checkSide(args[1]);
+	if (!party) return;
+	int index = std::stoi(args[2]);
+	if (index >= (*party).size()) {
+		std::cout << "invalid index\n" << std::endl;
+		return;
+	}
+	(*party).erase((*party).begin() + index);
+	printParty(*party);
+}
+
+void equip(const std::vector<std::string> &args) {
+	if (args.size() < 5) {
+		std::cout << "missing argument\n" << std::endl;
+		return;
+	}
+	const std::vector<Being *> *party = checkSide(args[1]);
+	if (!party) return;
+	int index = std::stoi(args[2]);
+	if (index >= (*party).size()) {
+		std::cout << "invalid index\n" << std::endl;
+		return;
+	}
+	Character *character;
+	if (!(character = dynamic_cast<Character *>((*party)[index]))) {
+		std::cout << "only character can equip equipment\n" << std::endl;
+		return;
+	}
+	if (args[3] == "artifact" || args[3] == "1") {
+		try {
+			(*character).equip(Artifact(args[4]));
+		} catch (const std::invalid_argument &error) {
+			std::cout << "invalid name\n" << std::endl;
+		}
+		printParty(*party);
+	} else if (args[3] == "weapon" || args[3] == "2") {
+		try {
+			(*character).equip(Weapon(args[4]));
+		} catch (const std::invalid_argument &error) {
+			std::cout << "invalid name\n" << std::endl;
+		}
+		printParty(*party);
+	} else {
+		std::cout << "invalid argument: must be artifact or weapon, but got ";
+		std::cout << args[3] << '\n' << std::endl;
+	}
 }
 
 void simulation() {
-	std::string ui;
+	std::string ui;  // user input
 	std::vector<std::string> args;
-	std::vector<Being *> allyParty;
-	std::vector<Being *> enemyParty;
 	system("clear");
 	std::cout << "digit can be use for shorthand, ex: 1 1 for list creature\n" << std::endl;
 	while (true) {
-		std::cout << "list <creature|character>\n";
-		std::cout << "view <ally|enemy>\n";
-		std::cout << "add <ally|enemy> <creature|character> <name>\n";
-		std::cout << "remove <ally|enemy> <index>\n";
-		std::cout << "5\n";
+		std::cout << "1: list <artifact|creature|character|weapon>\n";
+		std::cout << "2: view <ally|enemy>\n";
+		std::cout << "3: add <ally|enemy> <creature|character> <name>\n";
+		std::cout << "4: remove <ally|enemy> <index>\n";
+		std::cout << "5: equip <ally|enemy> <index> <artifact|weapon> <name>\n";
 		std::cout << "6\n";
 		std::cout << "7\n";
 		std::cout << "8\n";
 		std::cout << "9\n";
-		std::cout << "quit\n" << std::endl;
+		std::cout << "0: quit\n" << std::endl;
 
 		std::cout << ">>> ";
 		args.clear();
@@ -136,95 +155,13 @@ void simulation() {
 			std::cout << "no command entered\n" << std::endl;
 			continue;
 		}
-		if (args[0] == "list" || args[0] == "1") {
-			if (args.size() < 2) {
-				std::cout << "missing argument\n" << std::endl;
-				continue;
-			}
-			system("clear");
-			if (args[1] == "creature" || args[1] == "1") {
-				printCSV("src/data/being/creature.csv");
-			} else if (args[1] == "character" || args[1] == "2") {
-				printCSV("src/data/being/character.csv");
-			} else {
-				std::cout << "no valid argument\n" << std::endl;
-			}
-			continue;
-		}
-		if (args[0] == "view" || args[0] == "2") {
-			if (args.size() < 2) {
-				std::cout << "missing argument\n" << std::endl;
-				continue;
-			}
-			if (args[1] == "ally" || args[1] == "1") {
-				printParty(allyParty);
-			} else if (args[1] == "enemy" || args[1] == "2") {
-				printParty(enemyParty);
-			} else {
-				std::cout << "invalid argument: must be ally or enemy, but got ";
-				std::cout << args[1] << '\n' << std::endl;
-			}
-			continue;
-		}
-		if (args[0] == "add" || args[0] == "3") {
-			if (args.size() < 4) {
-				std::cout << "missing argument\n" << std::endl;
-				continue;
-			}
-			std::vector<Being *> *party;
-			if (args[1] == "ally" || args[1] == "1") party = &allyParty;
-			else if (args[1] == "enemy" || args[1] == "2") party = &enemyParty;
-			else {
-				std::cout << "invalid argument: must be ally or enemy, but got ";
-				std::cout << args[1] << '\n' << std::endl;
-				continue;
-			}
-			if (args[2] == "creature" || args[2] == "1") {
-				try {
-					(*party).push_back(new Creature(args[3]));
-				} catch (const std::invalid_argument &error) {
-					std::cout << "invalid name\n" << std::endl;
-				}
-				printParty(*party);
-			} else if (args[2] == "character" || args[2] == "2") {
-				try {
-					(*party).push_back(new Character(args[3]));
-				} catch (const std::invalid_argument &error) {
-					std::cout << "invalid name\n" << std::endl;
-				}
-				printParty(*party);
-			} else {
-				std::cout << "invalid argument\n" << std::endl;
-			}
-			continue;
-		}
-		if (args[0] == "remove" || args[0] == "4") {
-			if (args.size() < 3) {
-				std::cout << "missing argument\n" << std::endl;
-				continue;
-			}
-			std::vector<Being *> *party;
-			if (args[1] == "ally" || args[1] == "1") party = &allyParty;
-			else if (args[1] == "enemy" || args[1] == "2") party = &enemyParty;
-			else {
-				std::cout << "invalid argument: must be ally or enemy, but got ";
-				std::cout << args[1] << '\n' << std::endl;
-				continue;
-			}
-			int index = std::stoi(args[2]);
-			if (index >= (*party).size()) {
-				std::cout << "invalid index\n" << std::endl;
-				continue;
-			}
-			(*party).erase((*party).begin() + index);
-			printParty((*party));
-			continue;
-		}
-		if (args[0] == "quit" || args[0] == "0") {
-			system("clear");
-			return;
-		}
-		std::cout << "no valid command\n" << std::endl;
-		continue;
+
+		if (args[0] == "list" || args[0] == "1") list(args);
+		else if (args[0] == "view" || args[0] == "2") view(args);
+		else if (args[0] == "add" || args[0] == "3") add(args);
+		else if (args[0] == "remove" || args[0] == "4") remove(args);
+		else if (args[0] == "equip" || args[0] == "5") equip(args);
+		else if (args[0] == "quit" || args[0] == "0") {system("clear"); return;}
+		else std::cout << "no valid command\n" << std::endl;
 	}
 }

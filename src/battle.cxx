@@ -24,7 +24,7 @@ Being *advanceTimeline(std::vector<Being *> &timeline) {
 	return leadBeing;
 }
 
-void startBattle(std::vector<Being *> allyVec, std::vector<Being *> enemyVec) {
+void startBattle(const std::vector<Being *> &allyVec, const std::vector<Being *> &enemyVec) {
 	std::vector<Being *> timeline;
 	for (const std::vector<Being *> &vec: {allyVec, enemyVec}) {
 		for (unsigned short i = 0; i < vec.size(); ++i) {

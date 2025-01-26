@@ -6,7 +6,7 @@
 
 #include "equipment.hxx"
 
-Equipment::Equipment(std::string name): name(name) {
+Equipment::Equipment(const std::string &name): name(name) {
 	std::memset(&increment, 0, sizeof(increment));
 }
 
@@ -14,7 +14,6 @@ void Equipment::statInitFromFile(std::string filePath) {
 	std::ifstream file(filePath);
 	std::string line;
 	while (std::getline(file, line)) {
-		bool nextLoop = false;
 		std::string token;
 		std::stringstream ss(line);
 
@@ -33,10 +32,10 @@ void Equipment::statInitFromFile(std::string filePath) {
 	std::cout << name << " not found in database" << std::endl;
 }
 
-Artifact::Artifact(std::string name): Equipment(name) {
+Artifact::Artifact(const std::string &name): Equipment(name) {
 	statInitFromFile("src/data/equipment/artifact.csv");
 }
 
-Weapon::Weapon(std::string name): Equipment(name) {
+Weapon::Weapon(const std::string &name): Equipment(name) {
 	statInitFromFile("src/data/equipment/weapon.csv");
 }

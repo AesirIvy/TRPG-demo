@@ -1,7 +1,3 @@
-#include <array>
-#include <iostream>
-#include <vector>
-
 // #include <SFML/Graphics.hpp>
 
 #include "battle.hxx"

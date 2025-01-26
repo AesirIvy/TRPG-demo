@@ -12,17 +12,18 @@ public:
 	Stats increment;
 
 	void statInitFromFile(std::string file_path);
-	Equipment(std::string name);
+	explicit Equipment(const std::string &name);
+	virtual ~Equipment() = default;
 };
 
 class Artifact: public Equipment {
 public:
-	Artifact(std::string name);
+	explicit Artifact(const std::string &name);
 };
 
 class Weapon: public Equipment {
 public:
-	Weapon(std::string name);
+	explicit Weapon(const std::string &name);
 };
 
 #endif
