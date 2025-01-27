@@ -5,7 +5,7 @@
 
 #include "being.hxx"
 
-Being::Being(const std::string &name): name(name), base(), current() {
+Being::Being(const std::string &id): id(id), base(), current() {
 
 }
 
@@ -24,8 +24,10 @@ void Being::statInitFromFile(std::string filePath) {
 		std::stringstream ss(line);
 
 		std::getline(ss, token, '\t');
-		if (token != name) continue;
+		if (token != id) continue;
 
+		std::getline(ss, token, '\t');
+		name = token;
 		std::getline(ss, token, '\t');
 		base.HP = std::stoi(token);
 		std::getline(ss, token, '\t');
@@ -35,28 +37,28 @@ void Being::statInitFromFile(std::string filePath) {
 		std::getline(ss, token, '\t');
 		base.TD = std::stoi(token);
 
-		m_maxHP = base.HP;
+		maxHP = base.HP;
 		current.ATK = base.ATK;
 		current.DEF = base.DEF;
 		current.TD = base.TD;
 		return;
 	}
-	throw std::invalid_argument(name + " not found in database\n");
+	throw std::invalid_argument(id + " not found in database\n");
 }
 
 void Being::battleStatRefresh() {
-	int percentageHP = current.HP / m_maxHP;
+	int percentageHP = current.HP / maxHP;
 	current.ATK = base.ATK * percentageHP;
 	current.DEF = base.DEF * percentageHP;
 }
 
-Character::Character(const std::string &name): Being(name) {
+Character::Character(const std::string &id): Being(id) {
 	statInitFromFile("src/data/being/character.csv");
 	fullRecovery();
 }
 
 void Character::battleInit() {
-	charge = 0;
+	DP = 0;
 }
 
 void Character::depriveArtifact() {
@@ -78,28 +80,26 @@ void Character::equip(const Equipment &equipment) {
 }
 
 void Character::fullRecovery() {
-	current.HP = m_maxHP;
-	m_recoveryGauge = m_maxHP;
+	current.HP = maxHP;
+	recoveryGauge = maxHP;
 }
 
 void Character::heal(int amount) {
 	current.HP += amount;
-	if (current.HP > m_maxHP) {
-		current.HP = m_maxHP;
+	if (current.HP > maxHP) {
+		current.HP = maxHP;
 	}
 }
 
-void Character::increaseCharge(int amount) {
-	charge += amount;
-	if (charge > 300) {
-		charge = 300;
-	}
+void Character::increaseDP(int amount) {
+	DP += amount;
+	if (DP > 100) DP = 100;
 }
 
 void Character::increaseSP(int amount) {
 	current.SP += amount;
-	if (current.SP > m_maxHP) {
-		current.SP = m_maxHP;
+	if (current.SP > maxHP) {
+		current.SP = maxHP;
 	}
 }
 
@@ -111,34 +111,33 @@ bool Character::isOnDeathDoor() const {
 }
 
 unsigned short Character::isUltReady() const {
-	if (charge == 300) return 3;
-	if (charge >= 200) return 2;
-	if (charge >= 100) return 1;
+	if (DP == 100) return 1;
 	return 0;
 }
 
 void Character::receiveDmg(int amount) {
-	if (!guarding) amount *= 1.5;  // critical damage for being off-guard
+	if (!exposed) amount *= 1.5;  // critical damage for being off-guard
+	else increaseDP(2);
 	if (isOnDeathDoor()) {
 		alive = false;
 	}
-	m_recoveryGauge = current.HP;
+	recoveryGauge = current.HP;
 	current.HP -= amount;
 }
 
 void Character::statRefresh() {
-	m_maxHP = base.HP;
+	maxHP = base.HP;
 	current.ATK = base.ATK + weapon.increment.ATK;
 	current.DEF = base.DEF + weapon.increment.DEF;
 }
 
-Creature::Creature(const std::string &name): Being(name) {
+Creature::Creature(const std::string &id): Being(id) {
 	statInitFromFile("src/data/being/creature.csv");
 	fullRecovery();
 }
 
 void Creature::fullRecovery() {
-	current.HP = m_maxHP;
+	current.HP = maxHP;
 }
 
 void Creature::receiveDmg(int amount) {

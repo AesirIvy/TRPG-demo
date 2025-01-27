@@ -9,9 +9,11 @@
 class Being {
 public:
 	bool alive = true;
-	bool guarding = false;
+	bool exposed = false;
 	bool playerSide = true;
-	int IP = 0;  // Initiative Point
+	int maxHP;
+	short IP = 0;  // Initiative Point
+	std::string id;
 	std::string name;
 
 	Stats base;
@@ -22,16 +24,13 @@ public:
 	virtual void receiveDmg(int amount) = 0;
 	void statInitFromFile(std::string filePath);
 
-	explicit Being(const std::string &name);
+	explicit Being(const std::string &id);
 	virtual ~Being() = default;
-
-protected:
-	int m_maxHP;
 };
 
 class Creature: public Being {
 public:
-	explicit Creature(const std::string &name);
+	explicit Creature(const std::string &id);
 
 	void fullRecovery();
 	void receiveDmg(int amount) override;
@@ -39,13 +38,14 @@ public:
 
 class Character: public Being {
 public:
-	short charge;
+	short DP = 0;  // Determination Point
+	int recoveryGauge;
 	unsigned int status;
 
 	Artifact artifact = Artifact("None");
 	Weapon weapon = Weapon("None");
 
-	explicit Character(const std::string &name);
+	explicit Character(const std::string &id);
 
 	void battleInit();
 	void depriveArtifact();
@@ -54,14 +54,11 @@ public:
 	void fullRecovery();
 	void heal(int amount);
 	void increaseSP(int amount);
-	void increaseCharge(int amount);
+	void increaseDP(int amount);
 	bool isOnDeathDoor() const;
 	unsigned short isUltReady() const;
 	void receiveDmg(int amount) override;
 	void statRefresh();
-
-private:
-	int m_recoveryGauge;
 };
 
 #endif

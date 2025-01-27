@@ -57,14 +57,14 @@ void add(const std::vector<std::string> &args) {
 		try {
 			(*party).push_back(new Creature(args[3]));
 		} catch (const std::invalid_argument &error) {
-			std::cout << "invalid name\n" << std::endl;
+			std::cout << "invalid id\n" << std::endl;
 		}
 		printParty(*party);
 	} else if (args[2] == "character" || args[2] == "2") {
 		try {
 			(*party).push_back(new Character(args[3]));
 		} catch (const std::invalid_argument &error) {
-			std::cout << "invalid name\n" << std::endl;
+			std::cout << "invalid id\n" << std::endl;
 		}
 		printParty(*party);
 	} else {
@@ -109,14 +109,14 @@ void equip(const std::vector<std::string> &args) {
 		try {
 			(*character).equip(Artifact(args[4]));
 		} catch (const std::invalid_argument &error) {
-			std::cout << "invalid name\n" << std::endl;
+			std::cout << "invalid id\n" << std::endl;
 		}
 		printParty(*party);
 	} else if (args[3] == "weapon" || args[3] == "2") {
 		try {
 			(*character).equip(Weapon(args[4]));
 		} catch (const std::invalid_argument &error) {
-			std::cout << "invalid name\n" << std::endl;
+			std::cout << "invalid id\n" << std::endl;
 		}
 		printParty(*party);
 	} else {
@@ -124,6 +124,8 @@ void equip(const std::vector<std::string> &args) {
 		std::cout << args[3] << '\n' << std::endl;
 	}
 }
+
+void battle();
 
 void simulation() {
 	std::string ui;  // user input
@@ -133,9 +135,9 @@ void simulation() {
 	while (true) {
 		std::cout << "1: list <artifact|creature|character|weapon>\n";
 		std::cout << "2: view <ally|enemy>\n";
-		std::cout << "3: add <ally|enemy> <creature|character> <name>\n";
+		std::cout << "3: add <ally|enemy> <creature|character> <id>\n";
 		std::cout << "4: remove <ally|enemy> <index>\n";
-		std::cout << "5: equip <ally|enemy> <index> <artifact|weapon> <name>\n";
+		std::cout << "5: equip <ally|enemy> <index> <artifact|weapon> <id>\n";
 		std::cout << "6\n";
 		std::cout << "7\n";
 		std::cout << "8\n";

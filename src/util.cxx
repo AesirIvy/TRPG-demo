@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "being.hxx"
-#include "util.hxx"
 
 void printCSV(std::string filePath) {
 	std::ifstream file(filePath);
@@ -14,7 +13,7 @@ void printCSV(std::string filePath) {
 	std::string temp;
 
 	unsigned short column;
-	unsigned short lastColIdx;
+	unsigned short lastColIdx;  // last column index
 
 	std::getline(file, line);
 	std::istringstream stream(line);
@@ -98,12 +97,17 @@ void printParty(const std::vector<Being *> &party) {
 		return;
 	}
 	for (unsigned short i = 0; i < party.size(); ++i) {
-		std::cout << party[i]->name;
+		std::cout << party[i]->id;
 		if (Character *character = dynamic_cast<Character *>(party[i])) {
 			std::cout << " weapon: ";
 			std::cout << character->weapon.name << " artifact: ";
 			std::cout << character->artifact.name;
 		}
+		std::cout << '\n';
+		std::cout << "HP: " << party[i]->current.HP << '/' << party[i]->maxHP << '\n';
+		std::cout << "ATK: " << party[i]->current.ATK << '\n';
+		std::cout << "DEF: " << party[i]->current.DEF << '\n';
+		std::cout << "TD: " << party[i]->current.TD << '\n';
 		std::cout << '\n';
 	}
 	std::cout << std::endl;

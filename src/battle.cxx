@@ -1,7 +1,6 @@
 #include <array>
 #include <vector>
 
-#include "battle.hxx"
 #include "being.hxx"
 
 void addToTimeline(std::vector<Being *> &timeline, Being &being) {
