@@ -12,6 +12,7 @@ public:
 	bool exposed = false;
 	bool playerSide = true;
 	int maxHP;
+	int recoveryGauge;
 	short IP = 0;  // Initiative Point
 	std::string id;
 	std::string name;
@@ -19,11 +20,15 @@ public:
 	Stats base;
 	Stats current;
 
-	void basicAttack(Being &enemy);
 	void battleStatRefresh();
-	virtual void receiveDmg(int amount) = 0;
 	void statInitFromFile(std::string filePath);
 
+	virtual void attack(Being &enemy, int pcATK);
+	virtual void heal(int amount);
+	virtual void receiveDmg(int dmg);
+	virtual void shield(int amount);
+
+protected:
 	explicit Being(const std::string &id);
 	virtual ~Being() = default;
 };
@@ -33,13 +38,11 @@ public:
 	explicit Creature(const std::string &id);
 
 	void fullRecovery();
-	void receiveDmg(int amount) override;
 };
 
 class Character: public Being {
 public:
 	short DP = 0;  // Determination Point
-	int recoveryGauge;
 	unsigned int status;
 
 	Artifact artifact = Artifact("None");
@@ -47,17 +50,16 @@ public:
 
 	explicit Character(const std::string &id);
 
+	void attack(Being &enemy, int pcATK) override;
 	void battleInit();
 	void depriveArtifact();
 	void depriveWeapon();
 	void equip(const Equipment &equipment);
 	void fullRecovery();
-	void heal(int amount);
-	void increaseSP(int amount);
 	void increaseDP(int amount);
 	bool isOnDeathDoor() const;
-	unsigned short isUltReady() const;
-	void receiveDmg(int amount) override;
+	bool isUltReady() const;
+	void receiveDmg(int dmg) override;
 	void statRefresh();
 };
 

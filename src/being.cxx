@@ -9,11 +9,10 @@ Being::Being(const std::string &id): id(id), base(), current() {
 
 }
 
-void Being::basicAttack(Being &enemy) {
-	int dmg = current.ATK - enemy.current.DEF;
-	if (dmg > 0) {
-		enemy.receiveDmg(dmg);
-	}
+void Being::battleStatRefresh() {
+	int percentageHP = current.HP / maxHP;
+	current.ATK = base.ATK * percentageHP;
+	current.DEF = base.DEF * percentageHP;
 }
 
 void Being::statInitFromFile(std::string filePath) {
@@ -46,15 +45,47 @@ void Being::statInitFromFile(std::string filePath) {
 	throw std::invalid_argument(id + " not found in database\n");
 }
 
-void Being::battleStatRefresh() {
-	int percentageHP = current.HP / maxHP;
-	current.ATK = base.ATK * percentageHP;
-	current.DEF = base.DEF * percentageHP;
+void Being::attack(Being &enemy, int pcATK) {
+	int dmg = current.ATK - current.DEF;
+	if (dmg < 0) dmg = 0;
+	enemy.receiveDmg(dmg);
+}
+
+void Being::heal(int amount) {
+	current.HP += amount;
+	if (current.HP > recoveryGauge) {
+		current.HP = (current.HP - recoveryGauge) / 2;
+		recoveryGauge = current.HP;
+	}
+	if (current.HP > maxHP) {
+		current.HP = maxHP;
+	}
+}
+
+void Being::receiveDmg(int dmg) {
+	if (!exposed) dmg *= 1.5;  // critical damage for being off-guard
+	current.SP -= dmg;
+	if (current.SP < 0) {
+		recoveryGauge = current.HP;
+		current.HP += current.SP;
+		current.SP = 0;
+	}
+}
+
+void Being::shield(int amount) {
+	current.SP += amount;
 }
 
 Character::Character(const std::string &id): Being(id) {
 	statInitFromFile("src/data/being/character.csv");
 	fullRecovery();
+}
+
+void Character::attack(Being &enemy, int pcATK) {
+	int dmg = current.ATK - current.DEF;
+	if (dmg < 0) dmg = 0;
+	else increaseDP(5);
+	enemy.receiveDmg(dmg);
 }
 
 void Character::battleInit() {
@@ -84,23 +115,9 @@ void Character::fullRecovery() {
 	recoveryGauge = maxHP;
 }
 
-void Character::heal(int amount) {
-	current.HP += amount;
-	if (current.HP > maxHP) {
-		current.HP = maxHP;
-	}
-}
-
 void Character::increaseDP(int amount) {
 	DP += amount;
 	if (DP > 100) DP = 100;
-}
-
-void Character::increaseSP(int amount) {
-	current.SP += amount;
-	if (current.SP > maxHP) {
-		current.SP = maxHP;
-	}
 }
 
 bool Character::isOnDeathDoor() const {
@@ -110,19 +127,23 @@ bool Character::isOnDeathDoor() const {
 	return false;
 }
 
-unsigned short Character::isUltReady() const {
-	if (DP == 100) return 1;
-	return 0;
+bool Character::isUltReady() const {
+	if (DP == 100) return true;
+	return false;
 }
 
-void Character::receiveDmg(int amount) {
-	if (!exposed) amount *= 1.5;  // critical damage for being off-guard
-	else increaseDP(2);
-	if (isOnDeathDoor()) {
+void Character::receiveDmg(int dmg) {
+	if (!exposed) dmg *= 1.5;  // critical damage for being off-guard
+	else increaseDP(5);
+	if (isOnDeathDoor() && dmg > 0) {
 		alive = false;
 	}
-	recoveryGauge = current.HP;
-	current.HP -= amount;
+	current.SP -= dmg;
+	if (current.SP < 0) {
+		recoveryGauge = current.HP;
+		current.HP += current.SP;
+		current.SP = 0;
+	}
 }
 
 void Character::statRefresh() {
@@ -138,8 +159,4 @@ Creature::Creature(const std::string &id): Being(id) {
 
 void Creature::fullRecovery() {
 	current.HP = maxHP;
-}
-
-void Creature::receiveDmg(int amount) {
-	current.HP -= amount;
 }

@@ -99,14 +99,14 @@ void printParty(const std::vector<Being *> &party) {
 	for (unsigned short i = 0; i < party.size(); ++i) {
 		std::cout << party[i]->id;
 		if (Character *character = dynamic_cast<Character *>(party[i])) {
-			std::cout << " weapon: ";
+			std::cout << "\tweapon: ";
 			std::cout << character->weapon.name << " artifact: ";
 			std::cout << character->artifact.name;
 		}
 		std::cout << '\n';
-		std::cout << "HP: " << party[i]->current.HP << '/' << party[i]->maxHP << '\n';
-		std::cout << "ATK: " << party[i]->current.ATK << '\n';
-		std::cout << "DEF: " << party[i]->current.DEF << '\n';
+		std::cout << "HP: " << party[i]->current.HP << '/' << party[i]->maxHP << ' ';
+		std::cout << "ATK: " << party[i]->current.ATK << ' ';
+		std::cout << "DEF: " << party[i]->current.DEF << ' ';
 		std::cout << "TD: " << party[i]->current.TD << '\n';
 		std::cout << '\n';
 	}

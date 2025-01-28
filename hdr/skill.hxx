@@ -4,25 +4,48 @@
 #include <string>
 #include <vector>
 
-class Skill {
-public:
+struct Param {
+	// pc: percentage
+
 	bool targetRequired;
 	unsigned short targetIdx;
-	std::string skillType;
+
+	unsigned short range;
 
 	bool modifier;
-	bool capMaxHP;
 	int modAmountHP;
 	int modAmountATK;
 	int modAmountDEF;
-	unsigned short range;
 
-	Skill(std::string id, Being *self);
+	bool heal;
+	int healAmount;
+
+	bool shield;
+	int shieldAmount;
+
+	bool damage;
+	int pcATK;
+};
+
+class Skill {
+public:
+	std::string skillType;
+
+	bool onDelay;
+
+	bool onAlly;
+	bool onEnemy;
+
+	Param ally;
+	Param enemy;
+
+	Skill(const std::string &id, Being *self);
 	void execute(std::vector<Being *> &allyParty, std::vector<Being *> &enemyParty);
 private:
 	Being *self;
 
-	void mod(Being *target);
+	void executeParty(std::vector<Being *> &party, const Param &side);
+	void mod(Being *target, const Param &side);
 };
 
 
