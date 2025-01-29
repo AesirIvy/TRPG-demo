@@ -1,8 +1,9 @@
 #ifndef SKILL_H
 #define SKILL_H
 
-#include <string>
-#include <vector>
+#include "pch.hxx"
+
+#include "being.hxx"
 
 struct Param {
 	// pc: percentage

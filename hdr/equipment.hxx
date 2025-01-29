@@ -1,7 +1,7 @@
 #ifndef EQUIPMENT_H
 #define EQUIPMENT_H
 
-#include <string>
+#include "pch.hxx"
 
 #include "stat.hxx"
 

@@ -1,7 +1,3 @@
-#include <string>
-#include <vector>
-
-#include "being.hxx"
 #include "skill.hxx"
 
 Skill::Skill(const std::string &id, Being *self): self(self) {

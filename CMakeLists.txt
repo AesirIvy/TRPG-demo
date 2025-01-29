@@ -21,5 +21,6 @@ include_directories(hdr)
 add_executable(${PROJECT_NAME} src/main.cxx)
 add_library(trpg src/battle.cxx src/being.cxx src/equipment.cxx src/skill.cxx src/simulation.cxx src/util.cxx)
 target_link_libraries(${PROJECT_NAME} PRIVATE trpg)
+target_precompile_headers(${PROJECT_NAME} PRIVATE hdr/pch.hxx)
 
 # target_link_libraries(${PROJECT_NAME} PRIVATE SFML::Graphics)

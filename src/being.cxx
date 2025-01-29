@@ -1,7 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string>
 
 #include "being.hxx"
 
@@ -89,17 +88,8 @@ void Character::attack(Being &enemy, int pcATK) {
 }
 
 void Character::battleInit() {
+	current.SP = 0;
 	DP = 0;
-}
-
-void Character::depriveArtifact() {
-	artifact = Artifact("None");
-	statRefresh();
-}
-
-void Character::depriveWeapon() {
-	weapon = Weapon("None");
-	statRefresh();
 }
 
 void Character::equip(const Equipment &equipment) {
@@ -108,6 +98,7 @@ void Character::equip(const Equipment &equipment) {
 	} else if (const Weapon *weaponPtr = dynamic_cast<const Weapon *>(&equipment)) {
 		weapon = *weaponPtr;
 	}
+	statRefresh();
 }
 
 void Character::fullRecovery() {
@@ -159,4 +150,5 @@ Creature::Creature(const std::string &id): Being(id) {
 
 void Creature::fullRecovery() {
 	current.HP = maxHP;
+	recoveryGauge = maxHP;
 }

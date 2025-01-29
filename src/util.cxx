@@ -1,91 +1,66 @@
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string>
-#include <vector>
 
-#include "being.hxx"
+#include "util.hxx"
+
+void printRow(const std::vector<uint8_t> &colWidth, std::string &line) {
+	std::string token;
+	std::istringstream stream(line);
+	std::cout << "║";
+	for (uint8_t column = 0; column < colWidth.size(); ++column) {
+		stream >> token;
+		std::cout << token;
+		for (uint8_t i = token.size(); i < colWidth[column]; ++i) {
+			std::cout << ' ';
+		}
+		if (column != colWidth.size() - 1) std::cout << "│";
+	}
+	std::cout << "║\n";
+}
+
+void printRowSep(
+	const std::vector<uint8_t> &colWidth,
+	const std::string &op,
+	const std::string &base,
+	const std::string &sep,
+	const std::string &end
+) {
+	std::cout << op;
+	for (uint8_t column = 0; column < colWidth.size(); ++column) {
+		for (uint8_t i = 0; i < colWidth[column]; ++i) std::cout << base;
+		if (column != colWidth.size() - 1) std::cout << sep;
+	}
+	std::cout << end << '\n';
+}
 
 void printCSV(std::string filePath) {
 	std::ifstream file(filePath);
 	std::string line;
-	std::string temp;
+	std::string token;
 
-	unsigned short column;
-	unsigned short lastColIdx;  // last column index
+	std::vector<uint8_t> colWidth;
 
 	std::getline(file, line);
 	std::istringstream stream(line);
-	lastColIdx = std::count_if(line.begin(), line.end(), [](char c){return c == '\t';});
+	uint8_t count = 0;
+	while (std::getline(stream, token, '\t')) {
+		if (count < 2) colWidth.push_back(16);
+		else colWidth.push_back(8);
+		++count;
+	}
 
-	std::cout << "╔";
-	for (int i = 0; i < 16; ++i) std::cout << "═";
-	for (int i = 0; i < lastColIdx; ++i) {
-		std::cout << "╤";
-		for (int j = 0; j < 8; ++j) {
-			std::cout << "═";
-		}
-	}
-	std::cout << "╗\n";
-
-	column = 0;
-	std::cout << "║";
-	while(stream >> temp) {
-		std::cout << temp;
-		for (unsigned short i = temp.size(); i < 16; ++i) {
-			if (i == 8 && column > 0) break;
-			std::cout << ' ';
-		}
-		if (column != lastColIdx) std::cout << "│";
-		++column;
-	}
-	std::cout << "║\n";
-	std::cout << "╠";
-	for (int i = 0; i < 16; ++i) std::cout << "═";
-	for (int i = 0; i < lastColIdx; ++i) {
-		std::cout << "╪";
-		for (int j = 0; j < 8; ++j) {
-			std::cout << "═";
-		}
-	}
-	std::cout << "╣\n";
+	printRowSep(colWidth, "╔", "═", "╤", "╗");
+	printRow(colWidth, line);
+	printRowSep(colWidth, "╠", "═", "╪", "╣");
 
 	while (std::getline(file, line)) {
-		std::istringstream stream(line);
-		column = 0;
-		std::cout << "║";
-		while(stream >> temp) {
-			std::cout << temp;
-			for (unsigned short i = temp.size(); i < 16; ++i) {
-				if (i == 8 && column > 0) break;
-				std::cout << ' ';
-			}
-			if (column != lastColIdx) std::cout << "│";
-			++column;
-		}
-		std::cout << "║\n";
+		printRow(colWidth, line);
 		if (file.peek() == EOF) break;
-		std::cout << "╟";
-		for (int i = 0; i < 16; ++i) std::cout << "─";
-		for (int i = 0; i < lastColIdx; ++i) {
-			std::cout << "┼";
-			for (int j = 0; j < 8; ++j) {
-				std::cout << "─";
-			}
-		}
-		std::cout << "╢\n";
+		printRowSep(colWidth, "╟", "─", "┼", "╢");
 	}
 
-	std::cout << "╚";
-	for (int i = 0; i < 16; ++i) std::cout << "═";
-	for (int i = 0; i < lastColIdx; ++i) {
-		std::cout << "╧";
-		for (int j = 0; j < 8; ++j) {
-			std::cout << "═";
-		}
-	}
-	std::cout << "╝\n";
+	printRowSep(colWidth, "╚", "═", "╧", "╝");
 
 	file.close();
 	std::cout << std::endl;

@@ -1,8 +1,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
-#include <string>
-#include <vector>
 
 #include "being.hxx"
 #include "util.hxx"

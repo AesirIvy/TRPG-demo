@@ -1,7 +1,7 @@
 #ifndef BEING_H
 #define BEING_H
 
-#include <string>
+#include "pch.hxx"
 
 #include "equipment.hxx"
 #include "stat.hxx"
@@ -52,8 +52,6 @@ public:
 
 	void attack(Being &enemy, int pcATK) override;
 	void battleInit();
-	void depriveArtifact();
-	void depriveWeapon();
 	void equip(const Equipment &equipment);
 	void fullRecovery();
 	void increaseDP(int amount);
