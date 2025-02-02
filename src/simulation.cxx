@@ -28,7 +28,9 @@ void list(const std::vector<std::string> &args) {
 		printCSV("src/data/being/creature.csv");
 	} else if (args[1] == "character" || args[1] == "3") {
 		printCSV("src/data/being/character.csv");
-	} else if (args[1] == "weapon" || args[1] == "4") {
+	} else if (args[1] == "machine" || args[1] == "4") {
+		printCSV("src/data/being/machine.csv");
+	} else if (args[1] == "weapon" || args[1] == "5") {
 		printCSV("src/data/equipment/weapon.csv");
 	} else {
 		std::cout << "no valid argument\n" << std::endl;
@@ -131,7 +133,7 @@ void simulation() {
 	system("clear");
 	std::cout << "digit can be use for shorthand, ex: 1 1 for list creature\n" << std::endl;
 	while (true) {
-		std::cout << "1: list <artifact|creature|character|weapon>\n";
+		std::cout << "1: list <artifact|creature|character|machine|weapon>\n";
 		std::cout << "2: view <ally|enemy>\n";
 		std::cout << "3: add <ally|enemy> <creature|character> <id>\n";
 		std::cout << "4: remove <ally|enemy> <index>\n";
