@@ -5,6 +5,7 @@
 
 #include "equipment.hxx"
 #include "stat.hxx"
+#include "status.hxx"
 
 class Being {
 public:
@@ -12,15 +13,15 @@ public:
 	bool exposed = false;
 	int maxSP = 0;
 	int maxHP = 0;
+	short AP = 0;
 	short IP = 0;  // Initiative Point
 	std::string id;
 	std::string name;
 
-	Status immune;
-	Status affected;
+	Stat base;
+	Stat current;
 
-	Stats base;
-	Stats current;
+	StatusManager statusManager;
 
 	void battleStatRefresh();
 
@@ -28,7 +29,6 @@ public:
 	virtual void heal(int amount);
 	virtual void receiveDmg(int dmg);
 	virtual void shield(int amount);
-	virtual void statInitFromFile(std::string filePath);
 
 protected:
 	explicit Being(const std::string &id);
@@ -42,9 +42,9 @@ protected:
 
 class Character: public Being {
 public:
+	bool onDeathDoor = false;
 	short DP = 0;  // Determination Point
 	int recoveryGauge;
-	unsigned int status;
 
 	Artifact artifact = Artifact("None");
 	Weapon weapon = Weapon("None");
@@ -52,14 +52,13 @@ public:
 	explicit Character(const std::string &id);
 
 	void attack(Being &enemy, int pcATK) override;
-	void battleInit();
 	void equip(const Equipment &equipment);
 	void fullRecovery();
 	void heal(int amount) override;
 	void increaseDP(int amount);
-	bool isOnDeathDoor() const;
 	bool isUltReady() const;
 	void receiveDmg(int dmg) override;
+	void statInitFromFile();
 	void statRefresh();
 };
 
@@ -73,6 +72,8 @@ public:
 	void fullRecovery();
 	void heal(int amount) override;
 	void receiveDmg(int dmg) override;
+	void statInitFromFile();
+	void statRefresh();
 };
 
 class Machine: public Being {
@@ -81,7 +82,9 @@ public:
 
 	void fullRecovery();
 	void receiveDmg(int dmg) override;
-	void statInitFromFile(std::string filePath) override;
+	void shield(int amount) override;
+	void statInitFromFile();
+	void statRefresh();
 };
 
-#endif
+#endif  // BEING_H

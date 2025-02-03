@@ -1,11 +1,11 @@
 #ifndef BATTLE_H
 #define BATTLE_H
 
-#include <vector>
+#include "pch.hxx"
 
 #include "being.hxx"
 
-void addToTimeline(std::vector<Being *> &timeline, Being &being);
-void startBattle(const std::vector<Being *> &allyArr, const std::vector<Being *> &enemyArr);
+// for testing purpose
+void console_wars(const std::vector<Being *> &allyArr, const std::vector<Being *> &enemyArr);
 
 #endif

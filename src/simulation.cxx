@@ -1,7 +1,10 @@
+#include <array>
 #include <cstdlib>
-#include <iostream>
+#include <functional>
 #include <sstream>
+#include <unordered_map>
 
+#include "battle.hxx"
 #include "being.hxx"
 #include "util.hxx"
 
@@ -22,22 +25,26 @@ void list(const std::vector<std::string> &args) {
 		return;
 	}
 	system("clear");
-	if (args[1] == "artifact" || args[1] == "1") {
-		printCSV("src/data/equipment/artifact.csv");
-	} else if (args[1] == "creature" || args[1] == "2") {
-		printCSV("src/data/being/creature.csv");
-	} else if (args[1] == "character" || args[1] == "3") {
-		printCSV("src/data/being/character.csv");
-	} else if (args[1] == "machine" || args[1] == "4") {
-		printCSV("src/data/being/machine.csv");
-	} else if (args[1] == "weapon" || args[1] == "5") {
-		printCSV("src/data/equipment/weapon.csv");
-	} else {
-		std::cout << "no valid argument\n" << std::endl;
-	}
+	std::string fileArr[5] = {
+		"src/data/equipment/artifact.csv",
+		"src/data/being/character.csv",
+		"src/data/being/creature.csv",
+		"src/data/being/machine.csv",
+		"src/data/equipment/weapon.csv"
+	};
+	std::unordered_map<std::string, std::string> fileMap {
+		{"artifact", fileArr[0]}, {"1", fileArr[0]},
+		{"character", fileArr[1]}, {"2", fileArr[1]},
+		{"creature", fileArr[2]}, {"3", fileArr[2]},
+		{"machine", fileArr[3]}, {"4", fileArr[3]},
+		{"weapon", fileArr[4]}, {"5", fileArr[4]}
+	};
+	auto iter = fileMap.find(args[1]);
+	if (iter != fileMap.end()) printCSV(iter->second);
+	else std::cout << "no valid argument\n" << std::endl;
 }
 
-void view(const std::vector<std::string> &args) {
+void viewParty(const std::vector<std::string> &args) {
 	if (args.size() < 2) {
 		std::cout << "missing argument\n" << std::endl;
 		return;
@@ -46,7 +53,7 @@ void view(const std::vector<std::string> &args) {
 	if (party) printParty(*party);
 }
 
-void add(const std::vector<std::string> &args) {
+void addBeingToParty(const std::vector<std::string> &args) {
 	if (args.size() < 4) {
 		std::cout << "missing argument\n" << std::endl;
 		return;
@@ -72,7 +79,7 @@ void add(const std::vector<std::string> &args) {
 	}
 }
 
-void remove(const std::vector<std::string> &args) {
+void removeBeingFromParty(const std::vector<std::string> &args) {
 	if (args.size() < 3) {
 		std::cout << "missing argument\n" << std::endl;
 		return;
@@ -88,7 +95,7 @@ void remove(const std::vector<std::string> &args) {
 	printParty(*party);
 }
 
-void equip(const std::vector<std::string> &args) {
+void equipBeing(const std::vector<std::string> &args) {
 	if (args.size() < 5) {
 		std::cout << "missing argument\n" << std::endl;
 		return;
@@ -125,21 +132,39 @@ void equip(const std::vector<std::string> &args) {
 	}
 }
 
-void battle();
+void battle(const std::vector<std::string> &args) {
+	console_wars(s_allyParty, s_enemyParty);
+}
+
+void quit(const std::vector<std::string> &args) {
+	system("clear");
+	exit(0);
+}
 
 void simulation() {
 	std::string ui;  // user input
 	std::vector<std::string> args;
+
+	std::unordered_map<std::string, std::function<void(const std::vector<std::string> &)>> commandMap = {
+		{"list", list}, {"1", list},
+		{"view", viewParty}, {"2", viewParty},
+		{"add", addBeingToParty}, {"3", addBeingToParty},
+		{"remove", removeBeingFromParty}, {"4", removeBeingFromParty},
+		{"equip", equipBeing}, {"5", equipBeing},
+		{"battle", battle}, {"7", battle},
+		{"quit", quit}, {"0", quit}
+	};
+
 	system("clear");
-	std::cout << "digit can be use for shorthand, ex: 1 1 for list creature\n" << std::endl;
+	std::cout << "digit can be use for shorthand, ex: 1 2 for list character\n" << std::endl;
 	while (true) {
-		std::cout << "1: list <artifact|creature|character|machine|weapon>\n";
+		std::cout << "1: list <artifact|character|creature|machine|weapon>\n";
 		std::cout << "2: view <ally|enemy>\n";
 		std::cout << "3: add <ally|enemy> <creature|character> <id>\n";
 		std::cout << "4: remove <ally|enemy> <index>\n";
 		std::cout << "5: equip <ally|enemy> <index> <artifact|weapon> <id>\n";
 		std::cout << "6\n";
-		std::cout << "7\n";
+		std::cout << "7: battle\n";
 		std::cout << "8\n";
 		std::cout << "9\n";
 		std::cout << "0: quit\n" << std::endl;
@@ -158,12 +183,11 @@ void simulation() {
 			continue;
 		}
 
-		if (args[0] == "list" || args[0] == "1") list(args);
-		else if (args[0] == "view" || args[0] == "2") view(args);
-		else if (args[0] == "add" || args[0] == "3") add(args);
-		else if (args[0] == "remove" || args[0] == "4") remove(args);
-		else if (args[0] == "equip" || args[0] == "5") equip(args);
-		else if (args[0] == "quit" || args[0] == "0") {system("clear"); return;}
-		else std::cout << "no valid command\n" << std::endl;
+		auto iter = commandMap.find(args[0]);
+		if (iter != commandMap.end()) {
+			iter->second(args);
+		} else {
+			std::cout << "no valid command\n" << std::endl;
+		}
 	}
 }

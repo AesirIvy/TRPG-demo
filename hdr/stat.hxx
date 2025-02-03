@@ -3,22 +3,15 @@
 
 #include "pch.hxx"
 
-struct Status {
-	bool alive = true;
-	bool onDeathDoor = false;
-	int8_t burnStack;  // Damage over time
-	short burnGauge;
-	int8_t freezeStack;  // Increase AP cost
-	short freezeGauge;
-};
-
-struct Stats {
+struct Stat {
 	int SP;    // Shield Point
 	int HP;    // HealtH Point
 	int ATK;   // Attack
 	int DEF;   // Defense
 
 	short TD;  // Turn Delay
+
+	Stat(): SP(0), HP(0), ATK(0), DEF(0), TD(0) {};
 };
 
 #endif

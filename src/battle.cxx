@@ -1,5 +1,4 @@
 #include <array>
-#include <vector>
 
 #include "being.hxx"
 
@@ -23,12 +22,20 @@ Being *advanceTimeline(std::vector<Being *> &timeline) {
 	return leadBeing;
 }
 
-void startBattle(const std::vector<Being *> &allyVec, const std::vector<Being *> &enemyVec) {
+void console_wars(const std::vector<Being *> &allyVec, const std::vector<Being *> &enemyVec) {
 	std::vector<Being *> timeline;
 	for (const std::vector<Being *> &vec: {allyVec, enemyVec}) {
 		for (unsigned short i = 0; i < vec.size(); ++i) {
 			addToTimeline(timeline, *vec[i]);
 		}
 	}
-	Being *leadBeing = advanceTimeline(timeline);
+
+	while (!allyVec.empty() && !enemyVec.empty()) {
+		Being *leadBeing = advanceTimeline(timeline);
+		if (dynamic_cast<Character *>(leadBeing)) {
+			// do stuff
+		} else {
+			// let it resolve
+		}
+	}
 }

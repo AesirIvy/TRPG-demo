@@ -10,9 +10,9 @@ public:
 	std::string id;
 	std::string name;
 
-	Stats increment;
+	Stat increment;
 
-	void statInitFromFile(std::string file_path);
+	void statInitFromFile(const std::string &file_path);
 	explicit Equipment(const std::string &id);
 	virtual ~Equipment() = default;
 };

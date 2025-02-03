@@ -1,10 +1,10 @@
 #include <fstream>
-#include <iostream>
 #include <sstream>
 
 #include "being.hxx"
+#include "util.hxx"
 
-Being::Being(const std::string &id): id(id), immune(), affected(), base(), current() {
+Being::Being(const std::string &id): id(id), base(), current(), statusManager() {
 
 }
 
@@ -35,47 +35,15 @@ void Being::receiveDmg(int dmg) {
 		current.SP = 0;
 	}
 	if (current.HP < 0) alive = false;
+	else battleStatRefresh();
 }
 
 void Being::shield(int amount) {
 	current.SP += amount;
 }
 
-void Being::statInitFromFile(std::string filePath) {
-	std::ifstream file(filePath);
-	std::string line;
-	while (std::getline(file, line)) {
-		std::string token;
-		std::stringstream ss(line);
-
-		std::getline(ss, token, '\t');
-		if (token != id) continue;
-
-		std::getline(ss, token, '\t');
-		name = token;
-		std::getline(ss, token, '\t');
-		base.HP = std::stoi(token);
-		std::getline(ss, token, '\t');
-		base.ATK = std::stoi(token);
-		std::getline(ss, token, '\t');
-		base.DEF = std::stoi(token);
-		std::getline(ss, token, '\t');
-		base.TD = std::stoi(token);
-
-		base.SP = 0;
-
-		maxSP = base.SP;
-		maxHP = base.HP;
-		current.ATK = base.ATK;
-		current.DEF = base.DEF;
-		current.TD = base.TD;
-		return;
-	}
-	throw std::invalid_argument(id + " not found in database\n");
-}
-
 Character::Character(const std::string &id): Being(id) {
-	statInitFromFile("src/data/being/character.csv");
+	statInitFromFile();
 	fullRecovery();
 }
 
@@ -84,11 +52,6 @@ void Character::attack(Being &enemy, int pcATK) {
 	if (dmg < 0) dmg = 0;
 	else increaseDP(5);
 	enemy.receiveDmg(dmg);
-}
-
-void Character::battleInit() {
-	current.SP = 0;
-	DP = 0;
 }
 
 void Character::equip(const Equipment &equipment) {
@@ -121,13 +84,6 @@ void Character::increaseDP(int amount) {
 	if (DP > 100) DP = 100;
 }
 
-bool Character::isOnDeathDoor() const {
-	if (current.HP < 0) {
-		return true;
-	}
-	return false;
-}
-
 bool Character::isUltReady() const {
 	if (DP == 100) return true;
 	return false;
@@ -136,25 +92,49 @@ bool Character::isUltReady() const {
 void Character::receiveDmg(int dmg) {
 	if (!exposed) dmg *= 1.5;  // critical damage for being off-guard
 	else increaseDP(5);
-	if (isOnDeathDoor() && dmg > current.SP) {
-		alive = false;
-	}
+
+	if (dmg <= 0) return;
+
 	current.SP -= dmg;
 	if (current.SP < 0) {
 		recoveryGauge = current.HP;
 		current.HP += current.SP;
 		current.SP = 0;
 	}
+	if (current.HP <= 0 && onDeathDoor) alive = false;
+	else if (current.HP <= 0) onDeathDoor = true;
+	else battleStatRefresh();
+}
+
+void Character::statInitFromFile() {
+	std::istringstream iss = dataFromCSV("src/data/being/character.csv", id);
+	if (iss.peek() == EOF) throw std::invalid_argument(id + " not found in database\n");
+
+	std::string token;
+
+	std::getline(iss, token, '\t');
+	name = token;
+	std::getline(iss, token, '\t');
+	base.HP = std::stoi(token);
+	std::getline(iss, token, '\t');
+	base.ATK = std::stoi(token);
+	std::getline(iss, token, '\t');
+	base.DEF = std::stoi(token);
+	std::getline(iss, token, '\t');
+	base.TD = std::stoi(token);
+
+	statRefresh();
 }
 
 void Character::statRefresh() {
+	maxSP = base.SP;
 	maxHP = base.HP;
 	current.ATK = base.ATK + weapon.increment.ATK;
 	current.DEF = base.DEF + weapon.increment.DEF;
 }
 
 Creature::Creature(const std::string &id): Being(id) {
-	statInitFromFile("src/data/being/creature.csv");
+	statInitFromFile();
 	fullRecovery();
 }
 
@@ -180,6 +160,26 @@ void Creature::heal(int amount) {
 	}
 }
 
+void Creature::statInitFromFile() {
+	std::istringstream iss = dataFromCSV("src/data/being/creature.csv", id);
+	if (iss.peek() == EOF) throw std::invalid_argument(id + " not found in database\n");
+
+	std::string token;
+
+	std::getline(iss, token, '\t');
+	name = token;
+	std::getline(iss, token, '\t');
+	base.HP = std::stoi(token);
+	std::getline(iss, token, '\t');
+	base.ATK = std::stoi(token);
+	std::getline(iss, token, '\t');
+	base.DEF = std::stoi(token);
+	std::getline(iss, token, '\t');
+	base.TD = std::stoi(token);
+
+	statRefresh();
+}
+
 void Creature::receiveDmg(int dmg) {
 	if (!exposed) dmg *= 1.5;  // critical damage for being off-guard
 	current.SP -= dmg;
@@ -189,10 +189,19 @@ void Creature::receiveDmg(int dmg) {
 		current.SP = 0;
 	}
 	if (current.HP <= 0) alive = false;
+	else battleStatRefresh();
+}
+
+void Creature::statRefresh() {
+	maxSP = base.SP;
+	maxHP = base.HP;
+	current.ATK = base.ATK;
+	current.DEF = base.DEF;
+	current.TD = base.TD;
 }
 
 Machine::Machine(const std::string &id): Being(id) {
-	statInitFromFile("src/data/being/machine.csv");
+	statInitFromFile();
 	fullRecovery();
 }
 
@@ -206,35 +215,37 @@ void Machine::receiveDmg(int dmg) {
 	if (current.SP <= 0) alive = false;
 }
 
-void Machine::statInitFromFile(std::string filePath) {
-	std::ifstream file(filePath);
-	std::string line;
-	while (std::getline(file, line)) {
-		std::string token;
-		std::stringstream ss(line);
-
-		std::getline(ss, token, '\t');
-		if (token != id) continue;
-
-		std::getline(ss, token, '\t');
-		name = token;
-		std::getline(ss, token, '\t');
-		base.SP = std::stoi(token);
-		std::getline(ss, token, '\t');
-		base.ATK = std::stoi(token);
-		std::getline(ss, token, '\t');
-		base.DEF = std::stoi(token);
-		std::getline(ss, token, '\t');
-		base.TD = std::stoi(token);
-
-		base.HP = 1;
-
-		maxSP = base.SP;
-		maxHP = base.HP;
-		current.ATK = base.ATK;
-		current.DEF = base.DEF;
-		current.TD = base.TD;
-		return;
+void Machine::shield(int amount) {
+	current.SP += amount;
+	if (current.SP > maxSP) {
+		current.SP = maxSP;
 	}
-	throw std::invalid_argument(id + " not found in database\n");
+}
+
+void Machine::statInitFromFile() {
+	std::istringstream iss = dataFromCSV("src/data/being/machine.csv", id);
+	if (iss.peek() == EOF) throw std::invalid_argument(id + " not found in database\n");
+
+	std::string token;
+
+	std::getline(iss, token, '\t');
+	name = token;
+	std::getline(iss, token, '\t');
+	base.SP = std::stoi(token);
+	std::getline(iss, token, '\t');
+	base.ATK = std::stoi(token);
+	std::getline(iss, token, '\t');
+	base.DEF = std::stoi(token);
+	std::getline(iss, token, '\t');
+	base.TD = std::stoi(token);
+
+	statRefresh();
+}
+
+void Machine::statRefresh() {
+	maxSP = base.SP;
+	maxHP = base.HP;
+	current.ATK = base.ATK;
+	current.DEF = base.DEF;
+	current.TD = base.TD;
 }

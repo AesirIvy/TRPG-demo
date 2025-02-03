@@ -1,8 +1,20 @@
 #include <fstream>
-#include <iostream>
 #include <sstream>
 
 #include "util.hxx"
+
+std::istringstream dataFromCSV(const std::string &filePath, const std::string &id) {
+	std::ifstream file(filePath);
+	std::string line;
+	while (std::getline(file, line)) {
+		std::string token;
+		std::istringstream iss(line);
+
+		std::getline(iss, token, '\t');
+		if (token == id) return iss;
+	}
+	return std::istringstream();
+}
 
 void printRow(const std::vector<uint8_t> &colWidth, std::string &line) {
 	std::string token;
@@ -79,7 +91,11 @@ void printParty(const std::vector<Being *> &party) {
 			std::cout << character->artifact.name;
 		}
 		std::cout << '\n';
-		std::cout << "HP: " << party[i]->current.HP << '/' << party[i]->maxHP << ' ';
+		if (dynamic_cast<Machine *>(party[i])) {
+			std::cout << "SP: " << party[i]->current.HP << '/' << party[i]->maxHP << ' ';
+		} else {
+			std::cout << "HP: " << party[i]->current.HP << '/' << party[i]->maxHP << ' ';
+		}
 		std::cout << "ATK: " << party[i]->current.ATK << ' ';
 		std::cout << "DEF: " << party[i]->current.DEF << ' ';
 		std::cout << "TD: " << party[i]->current.TD << '\n';

@@ -4,33 +4,26 @@
 #include <sstream>
 
 #include "equipment.hxx"
+#include "util.hxx"
 
 Equipment::Equipment(const std::string &id): id(id) {
-	std::memset(&increment, 0, sizeof(increment));
+
 }
 
-void Equipment::statInitFromFile(std::string filePath) {
-	std::ifstream file(filePath);
-	std::string line;
-	while (std::getline(file, line)) {
-		std::string token;
-		std::stringstream ss(line);
+void Equipment::statInitFromFile(const std::string &filePath) {
+	std::istringstream iss = dataFromCSV(filePath, id);
+	if (iss.peek() == EOF) throw std::invalid_argument(id + " not found in database\n");
 
-		std::getline(ss, token, '\t');
-		if (token != id) continue;
+	std::string token;
 
-		std::getline(ss, token, '\t');
-		name = token;
-		std::getline(ss, token, '\t');
-		increment.HP = std::stoi(token);
-		std::getline(ss, token, '\t');
-		increment.ATK = std::stoi(token);
-		std::getline(ss, token, '\t');
-		increment.DEF = std::stoi(token);
-
-		return;
-	}
-	std::cout << id << " not found in database" << std::endl;
+	std::getline(iss, token, '\t');
+	name = token;
+	std::getline(iss, token, '\t');
+	increment.HP = std::stoi(token);
+	std::getline(iss, token, '\t');
+	increment.ATK = std::stoi(token);
+	std::getline(iss, token, '\t');
+	increment.DEF = std::stoi(token);
 }
 
 Artifact::Artifact(const std::string &id): Equipment(id) {
