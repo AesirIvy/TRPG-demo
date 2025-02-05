@@ -4,6 +4,7 @@
 #include "pch.hxx"
 
 #include "equipment.hxx"
+#include "skill.hxx"
 #include "stat.hxx"
 #include "status.hxx"
 
@@ -21,7 +22,7 @@ public:
 	Stat base;
 	Stat current;
 
-	StatusManager statusManager;
+	std::vector<Status> statusVec;
 
 	void battleStatRefresh();
 
@@ -56,7 +57,6 @@ public:
 	void fullRecovery();
 	void heal(int amount) override;
 	void increaseDP(int amount);
-	bool isUltReady() const;
 	void receiveDmg(int dmg) override;
 	void statInitFromFile();
 	void statRefresh();

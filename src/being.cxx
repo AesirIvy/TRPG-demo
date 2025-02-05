@@ -4,11 +4,12 @@
 #include "being.hxx"
 #include "util.hxx"
 
-Being::Being(const std::string &id): id(id), base(), current(), statusManager() {
+Being::Being(const std::string &id): id(id), base(), current() {
 
 }
 
 void Being::battleStatRefresh() {
+	if (maxHP == 0) return;
 	int percentageHP = current.HP / maxHP;
 	current.ATK = base.ATK * percentageHP;
 	current.DEF = base.DEF * percentageHP;
@@ -34,7 +35,7 @@ void Being::receiveDmg(int dmg) {
 		current.HP += current.SP;
 		current.SP = 0;
 	}
-	if (current.HP < 0) alive = false;
+	if (current.HP <= 0) alive = false;
 	else battleStatRefresh();
 }
 
@@ -82,11 +83,6 @@ void Character::heal(int amount) {
 void Character::increaseDP(int amount) {
 	DP += amount;
 	if (DP > 100) DP = 100;
-}
-
-bool Character::isUltReady() const {
-	if (DP == 100) return true;
-	return false;
 }
 
 void Character::receiveDmg(int dmg) {

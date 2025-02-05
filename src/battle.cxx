@@ -13,6 +13,14 @@ void addToTimeline(std::vector<Being *> &timeline, Being &being) {
 	timeline.push_back(&being);
 }
 
+void resolveStatus(Being &being) {
+	for (const Status &status: being.statusVec) {
+		if (status.isDamage) being.receiveDmg(status.amount);
+		else if (status.isLeak) being.AP -= status.amount;
+		else if (status.isSlow) being.current.SP -= status.amount;
+	}
+}
+
 Being *advanceTimeline(std::vector<Being *> &timeline) {
 	Being *leadBeing = timeline[0];
 	timeline.erase(timeline.begin());
@@ -30,8 +38,18 @@ void console_wars(const std::vector<Being *> &allyVec, const std::vector<Being *
 		}
 	}
 
-	while (!allyVec.empty() && !enemyVec.empty()) {
+	while (true) {
+		if (allyVec.empty()) {
+			std::cout << "They won this fight." << std::endl;
+			return;
+		}
+		if (enemyVec.empty()) {
+			std::cout << "You won this fight." << std::endl;
+			return;
+		}
+
 		Being *leadBeing = advanceTimeline(timeline);
+		resolveStatus(*leadBeing);
 		if (dynamic_cast<Character *>(leadBeing)) {
 			// do stuff
 		} else {

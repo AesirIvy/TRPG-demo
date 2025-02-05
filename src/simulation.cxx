@@ -64,14 +64,14 @@ void addBeingToParty(const std::vector<std::string> &args) {
 		try {
 			(*party).push_back(new Creature(args[3]));
 		} catch (const std::invalid_argument &error) {
-			std::cout << "invalid id\n" << std::endl;
+			std::cout << error.what() << '\n' << std::endl;
 		}
 		printParty(*party);
 	} else if (args[2] == "character" || args[2] == "2") {
 		try {
 			(*party).push_back(new Character(args[3]));
 		} catch (const std::invalid_argument &error) {
-			std::cout << "invalid id\n" << std::endl;
+			std::cout << error.what() << '\n' << std::endl;
 		}
 		printParty(*party);
 	} else {
@@ -116,14 +116,14 @@ void equipBeing(const std::vector<std::string> &args) {
 		try {
 			(*character).equip(Artifact(args[4]));
 		} catch (const std::invalid_argument &error) {
-			std::cout << "invalid id\n" << std::endl;
+			std::cout << error.what() + '\n' << std::endl;
 		}
 		printParty(*party);
 	} else if (args[3] == "weapon" || args[3] == "2") {
 		try {
 			(*character).equip(Weapon(args[4]));
 		} catch (const std::invalid_argument &error) {
-			std::cout << "invalid id\n" << std::endl;
+			std::cout << error.what() + '\n' << std::endl;
 		}
 		printParty(*party);
 	} else {
