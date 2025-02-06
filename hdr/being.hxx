@@ -22,6 +22,8 @@ public:
 	Stat base;
 	Stat current;
 
+	skillFuncPtr passive;
+
 	std::vector<Status> statusVec;
 
 	void battleStatRefresh();

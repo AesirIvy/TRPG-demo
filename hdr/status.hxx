@@ -17,4 +17,4 @@ public:
 	Status(std::string name, uint8_t stack);
 };
 
-#endif
+#endif  // STATUS_H

@@ -12,4 +12,6 @@ using skillFuncPtr = void (*)(
 	std::vector<Being *> &enemyParty
 );
 
+skillFuncPtr findSkill(const std::string &id);
+
 #endif  // SKILL_H

@@ -27,4 +27,4 @@ public:
 	explicit Weapon(const std::string &id);
 };
 
-#endif
+#endif  // EQUIPMENT_H

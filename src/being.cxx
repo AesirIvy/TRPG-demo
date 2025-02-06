@@ -119,6 +119,9 @@ void Character::statInitFromFile() {
 	std::getline(iss, token, '\t');
 	base.TD = std::stoi(token);
 
+	std::getline(iss, token, '\t');
+	passive = findSkill(token);
+
 	statRefresh();
 }
 
@@ -172,6 +175,9 @@ void Creature::statInitFromFile() {
 	base.DEF = std::stoi(token);
 	std::getline(iss, token, '\t');
 	base.TD = std::stoi(token);
+
+	std::getline(iss, token, '\t');
+	passive = findSkill(token);
 
 	statRefresh();
 }
@@ -234,6 +240,9 @@ void Machine::statInitFromFile() {
 	base.DEF = std::stoi(token);
 	std::getline(iss, token, '\t');
 	base.TD = std::stoi(token);
+
+	std::getline(iss, token, '\t');
+	passive = findSkill(token);
 
 	statRefresh();
 }

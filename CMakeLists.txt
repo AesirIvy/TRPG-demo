@@ -10,6 +10,7 @@ set(TRPG_SRC
 	src/being.cxx
 	src/equipment.cxx
 	src/simulation.cxx
+	src/skill.cxx
 	src/status.cxx
 	src/util.cxx)
 

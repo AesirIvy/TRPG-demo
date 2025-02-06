@@ -1,6 +1,6 @@
-ID	Name	HP	ATK	DEF	TD
-Anastasis	Ana	2280	450	410	50
-Chise	Chise	2130	390	210	47
-Fenris	Fen	2810	510	380	45
-Lise-kid	Lise	1750	210	190	55
-Lise-teen	Lise	2150	380	230	50
+ID	Name	HP	ATK	DEF	TD	Passive
+Anastasis	Ana	2280	450	410	50	None
+Chise	Chise	2130	390	210	47	None
+Fenris	Fen	2810	510	380	45	None
+Lise-kid	Lise	1750	210	190	55	None
+Lise-teen	Lise	2150	380	230	50	None

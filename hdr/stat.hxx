@@ -14,4 +14,4 @@ struct Stat {
 	Stat(): SP(0), HP(0), ATK(0), DEF(0), TD(0) {};
 };
 
-#endif
+#endif  // STAT_H

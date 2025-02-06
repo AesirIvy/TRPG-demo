@@ -25,14 +25,14 @@ void list(const std::vector<std::string> &args) {
 		return;
 	}
 	system("clear");
-	std::string fileArr[5] = {
+	static const std::string fileArr[5] = {
 		"src/data/equipment/artifact.csv",
 		"src/data/being/character.csv",
 		"src/data/being/creature.csv",
 		"src/data/being/machine.csv",
 		"src/data/equipment/weapon.csv"
 	};
-	std::unordered_map<std::string, std::string> fileMap {
+	static const std::unordered_map<std::string, std::string> fileMap {
 		{"artifact", fileArr[0]}, {"1", fileArr[0]},
 		{"character", fileArr[1]}, {"2", fileArr[1]},
 		{"creature", fileArr[2]}, {"3", fileArr[2]},
@@ -145,7 +145,9 @@ void simulation() {
 	std::string ui;  // user input
 	std::vector<std::string> args;
 
-	std::unordered_map<std::string, std::function<void(const std::vector<std::string> &)>> commandMap = {
+	static const std::unordered_map<
+		std::string, std::function<void(const std::vector<std::string> &)>
+		> commandMap = {
 		{"list", list}, {"1", list},
 		{"view", viewParty}, {"2", viewParty},
 		{"add", addBeingToParty}, {"3", addBeingToParty},
@@ -156,20 +158,21 @@ void simulation() {
 	};
 
 	system("clear");
-	std::cout << "digit can be use for shorthand, ex: 1 2 for list character\n" << std::endl;
+	std::cout << "digit can be used as shorthand, ex: 1 2 for list character\n" << std::endl;
 	while (true) {
-		std::cout << "1: list <artifact|character|creature|machine|weapon>\n";
-		std::cout << "2: view <ally|enemy>\n";
-		std::cout << "3: add <ally|enemy> <creature|character> <id>\n";
-		std::cout << "4: remove <ally|enemy> <index>\n";
-		std::cout << "5: equip <ally|enemy> <index> <artifact|weapon> <id>\n";
-		std::cout << "6\n";
-		std::cout << "7: battle\n";
-		std::cout << "8\n";
-		std::cout << "9\n";
-		std::cout << "0: quit\n" << std::endl;
-
+		std::cout <<
+			"1: list <artifact|character|creature|machine|weapon>\n"
+			"2: view <ally|enemy>\n"
+			"3: add <ally|enemy> <creature|character> <id>\n"
+			"4: remove <ally|enemy> <index>\n"
+			"5: equip <ally|enemy> <index> <artifact|weapon> <id>\n"
+			"6\n"
+			"7: battle\n"
+			"8\n"
+			"9\n"
+			"0: quit\n\n";
 		std::cout << ">>> ";
+
 		args.clear();
 		std::getline(std::cin, ui);
 		std::istringstream stream(ui);
