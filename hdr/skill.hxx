@@ -6,7 +6,7 @@
 class Being;
 
 using skillFuncPtr = void (*)(
-	uint8_t targetIdx,
+	int8_t targetIdx,
 	Being &self,
 	std::vector<Being *> &allyParty,
 	std::vector<Being *> &enemyParty

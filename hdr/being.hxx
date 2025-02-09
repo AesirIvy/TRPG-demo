@@ -14,6 +14,7 @@ public:
 	bool exposed = false;
 	int maxSP = 0;
 	int maxHP = 0;
+	uint8_t position = 1;
 	short AP = 0;
 	short IP = 0;  // Initiative Point
 	std::string id;
@@ -23,6 +24,16 @@ public:
 	Stat current;
 
 	skillFuncPtr passive;
+
+	std::string qSkillName;
+	std::string wSkillName;
+	std::string eSkillName;
+	std::string rSkillName;
+
+	skillFuncPtr qSkill;
+	skillFuncPtr wSkill;
+	skillFuncPtr eSkill;
+	skillFuncPtr rSkill;
 
 	std::vector<Status> statusVec;
 

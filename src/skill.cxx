@@ -5,7 +5,7 @@
 #include "status.hxx"
 
 void megaranaBaseAttack(
-	uint8_t targetIdx,
+	int8_t targetIdx,
 	Being &self,
 	std::vector<Being *> &allyParty,
 	std::vector<Being *> &enemyParty
@@ -17,7 +17,7 @@ void megaranaBaseAttack(
 }
 
 void none(
-	uint8_t targetIdx,
+	int8_t targetIdx,
 	Being &self,
 	std::vector<Being *> &allyParty,
 	std::vector<Being *> &enemyParty

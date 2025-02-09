@@ -133,7 +133,7 @@ void equipBeing(const std::vector<std::string> &args) {
 }
 
 void battle(const std::vector<std::string> &args) {
-	console_wars(s_allyParty, s_enemyParty);
+	console_war(s_allyParty, s_enemyParty);
 }
 
 void quit(const std::vector<std::string> &args) {
@@ -170,8 +170,8 @@ void simulation() {
 			"7: battle\n"
 			"8\n"
 			"9\n"
-			"0: quit\n\n";
-		std::cout << ">>> ";
+			"0: quit\n\n"
+			">>> ";
 
 		args.clear();
 		std::getline(std::cin, ui);

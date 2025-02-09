@@ -6,6 +6,6 @@
 #include "being.hxx"
 
 // for testing purpose
-void console_wars(const std::vector<Being *> &allyArr, const std::vector<Being *> &enemyArr);
+void console_war(std::vector<Being *> &allyParty, std::vector<Being *> &enemyParty);
 
 #endif

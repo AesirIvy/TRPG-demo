@@ -1,17 +1,7 @@
-#include <array>
+#include <algorithm>
+#include <utility>
 
 #include "being.hxx"
-
-void addToTimeline(std::vector<Being *> &timeline, Being &being) {
-	being.IP = being.current.TD;
-	for (unsigned short i = 0; i < timeline.size(); ++i) {
-		if (being.IP < timeline[i]->IP) {
-			timeline.insert(timeline.begin() + i, &being);
-			return;
-		}
-	}
-	timeline.push_back(&being);
-}
 
 void resolveStatus(Being &being) {
 	for (const Status &status: being.statusVec) {
@@ -21,38 +11,69 @@ void resolveStatus(Being &being) {
 	}
 }
 
-Being *advanceTimeline(std::vector<Being *> &timeline) {
-	Being *leadBeing = timeline[0];
-	timeline.erase(timeline.begin());
-	for (unsigned short i = 0; i < timeline.size(); ++i) {
-		timeline[i]->IP -= leadBeing->IP;
+std::pair<bool, Being *> advanceTimeline(
+	std::vector<Being *> &allyParty,
+	std::vector<Being *> &enemyParty
+) {
+	bool isAlly;
+	Being *leadBeing;
+
+	// ls: left side
+	// rs: right side
+	auto minBeingIP = [](const Being *lsBeing, const Being *rsBeing) {
+		return lsBeing->IP < rsBeing->IP;
+	};
+	Being *allyLeadBeing = *std::min_element(allyParty.begin(), allyParty.end(), minBeingIP);
+	Being *enemyLeadBeing = *std::min_element(enemyParty.begin(), enemyParty.end(), minBeingIP);
+	if (allyLeadBeing->IP < enemyLeadBeing->IP) {
+		isAlly = true;
+		leadBeing = allyLeadBeing;
 	}
-	return leadBeing;
+	else {
+		isAlly = false;
+		leadBeing = enemyLeadBeing;
+	}
+
+	for (uint8_t i = 0; i < allyParty.size(); ++i) {
+		allyParty[i]->IP -= leadBeing->IP;
+	}
+	for (uint8_t i = 0; i < enemyParty.size(); ++i) {
+		allyParty[i]->IP -= leadBeing->IP;
+	}
+	return std::make_pair(isAlly, leadBeing);
 }
 
-void console_wars(const std::vector<Being *> &allyVec, const std::vector<Being *> &enemyVec) {
-	std::vector<Being *> timeline;
-	for (const std::vector<Being *> &vec: {allyVec, enemyVec}) {
-		for (unsigned short i = 0; i < vec.size(); ++i) {
-			addToTimeline(timeline, *vec[i]);
-		}
-	}
-
+void console_war(std::vector<Being *> &allyParty, std::vector<Being *> &enemyParty) {
 	while (true) {
-		if (allyVec.empty()) {
+		if (allyParty.empty()) {
 			std::cout << "They won this fight." << std::endl;
 			return;
 		}
-		if (enemyVec.empty()) {
+		if (enemyParty.empty()) {
 			std::cout << "You won this fight." << std::endl;
 			return;
 		}
 
-		Being *leadBeing = advanceTimeline(timeline);
+		bool isAlly;
+		Being *leadBeing;
+		std::tie(isAlly, leadBeing) = advanceTimeline(allyParty, enemyParty);
 		resolveStatus(*leadBeing);
-		if (dynamic_cast<Character *>(leadBeing)) {
-			// do stuff
+		if (isAlly) {
+			leadBeing->passive(0, *leadBeing, allyParty, enemyParty);
+			if (dynamic_cast<Character *>(leadBeing)) {
+				std::cout << "Q: " << leadBeing->qSkillName << "\n"
+					"W: " << leadBeing->wSkillName << "\n"
+					"E: " << leadBeing->eSkillName << "\n"
+					"R: " << leadBeing->rSkillName << '\n';
+				if (leadBeing->position < 4) std::cout << "T: switch to rearguard";
+				else std::cout << "T: switch to vanguard";
+				std::cout << "G: guard\n";
+				std::cout << ">>> ";
+			} else {
+				break;  // let it resolve
+			}
 		} else {
+			leadBeing->passive(0, *leadBeing, enemyParty, allyParty);
 			// let it resolve
 		}
 	}
